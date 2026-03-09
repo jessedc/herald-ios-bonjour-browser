@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Herald - Bonjour Network Browser for iOS</title>
-  <meta name="description" content="Herald discovers and inspects every Bonjour service on your network. Browse mDNS services, Thread border routers, and Matter devices from your iPhone.">
+  <meta name="description" content="Herald discovers and inspects Bonjour services on your local network. Browse 45+ service types, Thread border routers, and Matter devices from your iPhone.">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icon/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/icon/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Karla:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -80,35 +80,35 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           </div>
           <h3>All Services</h3>
-          <p>Browse Bonjour/mDNS services on your local network. See hostnames, IP addresses, ports, and TXT records at a glance.</p>
+          <p>Browse 45+ Bonjour service types — HTTP, SSH, AirPlay, HomeKit, printers, and more — in a single searchable list with live-updating service counts.</p>
         </div>
         <div class="feature-card reveal reveal-delay-1">
           <div class="feature-icon feature-icon--thread">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
           </div>
           <h3>Thread Network</h3>
-          <p>Discover Thread border routers and inspect network details — vendor, model, thread version, and mesh connectivity info.</p>
+          <p>Discover Thread Border Routers, TREL peers, SRP servers, and Matter commissioners with decoded metadata — network name, vendor, model, and Thread version.</p>
         </div>
         <div class="feature-card reveal reveal-delay-2">
           <div class="feature-icon feature-icon--matter">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           </div>
           <h3>Matter Devices</h3>
-          <p>Find Matter-compatible smart home devices on your network with commissioning status and service details.</p>
+          <p>Find Matter-compatible smart home devices with vendor lookup, device type, commissioning mode, and discriminator details.</p>
         </div>
         <div class="feature-card reveal">
           <div class="feature-icon feature-icon--detail">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           </div>
           <h3>Full Details</h3>
-          <p>Tap any service to see its hostname, port, IPv4/IPv6 addresses, domain, type description, and raw TXT records.</p>
+          <p>Tap any service to see its hostname, port, IPv4/IPv6 addresses, and parsed TXT records with human-readable labels.</p>
         </div>
         <div class="feature-card reveal reveal-delay-1">
           <div class="feature-icon feature-icon--search">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </div>
           <h3>Search</h3>
-          <p>Quickly find services by name.</p>
+          <p>Search across service names, types, and TXT record values to find what you're looking for instantly.</p>
         </div>
         <div class="feature-card reveal reveal-delay-2">
           <div class="feature-icon feature-icon--export">
@@ -150,11 +150,10 @@
   <section class="tech">
     <div class="container reveal">
       <h2 class="section-title">Under the Hood</h2>
-      <p class="tech-intro">Herald combines Apple's low-level <code>dns_sd</code> C API with the modern <code>NWBrowser</code> Network framework for real-time Bonjour discovery.</p>
+      <p class="tech-intro">Herald uses Apple's low-level <code>dns_sd</code> C API for direct communication with mDNSResponder, providing real-time Bonjour discovery without framework restrictions.</p>
       <div class="tech-pills">
         <span class="pill">Swift</span>
         <span class="pill">SwiftUI</span>
-        <span class="pill">Network.framework</span>
         <span class="pill">dns_sd</span>
         <span class="pill">mDNS / DNS-SD</span>
         <span class="pill">iOS 17+</span>
@@ -166,7 +165,7 @@
   <section class="open-source">
     <div class="container reveal">
       <h2 class="section-title">Open Source</h2>
-      <p class="open-source-desc">Herald is free and open source under the MIT License.</p>
+      <p class="open-source-desc">Herald is free and open source under the MIT License. No account required, no data collection — everything runs locally on your device.</p>
       <div class="cta-row cta-row-center">
         <a href="https://apps.apple.com/us/app/herald-bonjour-dns-sd/id6759459419" class="btn btn-primary">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px;vertical-align:-3px"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
@@ -193,6 +192,7 @@
           <a href="https://github.com/jessedc/herald-ios-bonjour-browser">GitHub</a>
           <a href="https://github.com/jessedc/herald-ios-bonjour-browser/blob/main/LICENSE">License</a>
           <a href="privacy-policy">Privacy Policy</a>
+          <a href="support">Support</a>
         </div>
       </div>
     </div>

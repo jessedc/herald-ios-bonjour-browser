@@ -34,7 +34,7 @@ html {
 }
 
 body {
-  font-family: 'Karla', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--text);
   background: var(--bg);
   line-height: 1.65;
@@ -50,9 +50,9 @@ body {
 
 /* ── Typography ─────────────────────────────────── */
 h1, h2, h3 {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   line-height: 1.15;
 }
 
@@ -150,7 +150,7 @@ code {
   gap: 10px;
   text-decoration: none;
   color: var(--text);
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 700;
   font-size: 1.15rem;
 }
@@ -194,7 +194,7 @@ code {
   align-items: center;
   padding: 14px 30px;
   border-radius: 100px;
-  font-family: 'Karla', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
@@ -544,7 +544,7 @@ h1 {
   align-items: center;
   gap: 8px;
   color: var(--text-muted);
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 0.92rem;
 }
@@ -568,6 +568,63 @@ h1 {
 
 .footer-links a:hover {
   color: var(--cyan);
+}
+
+/* ── Content Pages (support, etc.) ──────────────── */
+.content-page {
+  padding: 120px 0 80px;
+  position: relative;
+  z-index: 1;
+}
+
+.content-container {
+  max-width: 680px;
+}
+
+.content-title {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #ffffff 40%, var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.content-intro {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  margin-bottom: 40px;
+}
+
+.content-page h2 {
+  font-size: 1.15rem;
+  margin-top: 36px;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+
+.content-page h3 {
+  font-size: 1rem;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.content-page p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.75;
+  margin-bottom: 14px;
+}
+
+.content-page a {
+  color: var(--cyan);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.content-page a:hover {
+  color: #5dcbfb;
 }
 
 /* ── Scroll Reveal ──────────────────────────────── */
