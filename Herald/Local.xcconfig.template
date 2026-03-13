@@ -1,0 +1,9 @@
+// Local build settings for Herald
+//
+// Copy this file to Local.xcconfig and fill in your values:
+//   cp Local.xcconfig.template Local.xcconfig
+//
+// Local.xcconfig is gitignored and should not be committed.
+
+DEVELOPMENT_TEAM = YOUR_TEAM_ID
+PRODUCT_BUNDLE_IDENTIFIER = com.yourcompany.herald

@@ -1,0 +1,47 @@
+{
+  "configurations" : [
+    {
+      "id" : "282561A9-36B8-4CF3-9731-AE64F9A167D6",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Herald.xcodeproj",
+        "identifier" : "500000000000000000000003",
+        "name" : "HeraldTests"
+      }
+    },
+    {
+      "skippedTests" : [
+        "AppStoreScreenshotTests",
+        "AppStoreScreenshotTests\/testCaptureAppStoreScreenshots()",
+        "DNSSDReproductionTests",
+        "LiveNetworkNavigationTests",
+        "LiveNetworkNavigationTests\/testAllServicesExportWithLiveData()",
+        "LiveNetworkNavigationTests\/testAllServicesNavigateToDetailAndResolve()",
+        "LiveNetworkNavigationTests\/testAllServicesPullToRefresh()",
+        "LiveNetworkNavigationTests\/testAllServicesShowsServicesOnLoad()",
+        "LiveNetworkNavigationTests\/testFullTabNavigationRoundTrip()",
+        "LiveNetworkNavigationTests\/testMatterTabExportWithLiveData()",
+        "LiveNetworkNavigationTests\/testMatterTabLoads()",
+        "LiveNetworkNavigationTests\/testTabCyclingThenAllServicesShowsServices()",
+        "LiveNetworkNavigationTests\/testThreadTabExportWithLiveData()",
+        "LiveNetworkNavigationTests\/testThreadTabLoads()"
+      ],
+      "target" : {
+        "containerPath" : "container:Herald.xcodeproj",
+        "identifier" : "500000000000000000000002",
+        "name" : "HeraldUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

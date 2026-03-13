@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "591CB67B-FC78-4EFA-85CC-41145944BE45",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "selectedTests" : [
+        "DNSSDReproductionTests\/testBrowseBeforeMetaQueryBehavior()",
+        "DNSSDReproductionTests\/testDomainEnumBeforeMetaQuerySucceeds()",
+        "DNSSDReproductionTests\/testMetaQueryCrossDomainFailsOnSecondCall()",
+        "DNSSDReproductionTests\/testMetaQueryDoubleCallBehavior()"
+      ],
+      "target" : {
+        "containerPath" : "container:Herald.xcodeproj",
+        "identifier" : "500000000000000000000002",
+        "name" : "HeraldUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

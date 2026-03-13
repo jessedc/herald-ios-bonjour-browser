@@ -1,0 +1,5 @@
+// Config.xcconfig — checked into version control
+// Provides base configuration; Local.xcconfig (gitignored) can override for local dev.
+
+// Optional local overrides (team ID, bundle ID, etc.)
+#include? "Local.xcconfig"

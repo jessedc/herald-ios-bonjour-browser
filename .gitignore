@@ -1,0 +1,6 @@
+build
+.build
+.swiftpm
+
+# Local Xcode build settings (team ID, bundle identifier)
+Herald/Local.xcconfig

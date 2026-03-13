@@ -1,0 +1,32 @@
+{
+  "configurations" : [
+    {
+      "id" : "F3E84643-3EA9-415A-828B-EB117849F21A",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "selectedTests" : [
+        "AppStoreScreenshotTests\/test01_AllServices()",
+        "AppStoreScreenshotTests\/test02_ServiceDetail()",
+        "AppStoreScreenshotTests\/test03_ThreadNetwork()",
+        "AppStoreScreenshotTests\/test04_MatterDevices()",
+        "AppStoreScreenshotTests\/test05_TextExport()",
+        "AppStoreScreenshotTests\/testCaptureAppStoreScreenshots()"
+      ],
+      "target" : {
+        "containerPath" : "container:Herald.xcodeproj",
+        "identifier" : "500000000000000000000002",
+        "name" : "HeraldUITests"
+      }
+    }
+  ],
+  "version" : 1
+}
