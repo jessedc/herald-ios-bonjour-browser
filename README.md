@@ -4,7 +4,7 @@ A network discovery app for iOS that browses Bonjour (mDNS/DNS-SD) services on y
 
 Herald discovers announced service on your network — AirPlay speakers, printers, Thread border routers, Matter devices, and more — and shows their hostname, IP addresses, port, and TXT records.
 
-**Website:** [heraldapp.app](https://heraldapp.app)
+**App Store** [Herald](https://apps.apple.com/us/app/herald-bonjour-dns-sd/id6759459419) | **Website:** [heraldapp.app](https://heraldapp.app)
 
 <p align="center">
   <img src="screenshots/6.9-inch/01_AllServices.png" width="200" alt="All Services">
