@@ -9,6 +9,9 @@ final class ServiceDetailViewModel: ObservableObject, TextExportable {
     var resolverError: String? { resolver.error }
     var isResolving: Bool { resolver.isResolving }
     var resolved: ResolvedService? { resolver.resolved }
+    var reverseDNS: [String: String] { resolver.reverseDNS }
+    var isLookingUpReverseDNS: Bool { resolver.isLookingUpReverseDNS }
+    var didRunReverseDNS: Bool { resolver.didRunReverseDNS }
 
     let instance: ServiceInstance
     private var cancellables = Set<AnyCancellable>()
@@ -22,6 +25,10 @@ final class ServiceDetailViewModel: ObservableObject, TextExportable {
 
     func resolve() {
         resolver.resolve(instance: instance)
+    }
+
+    func runReverseDNS() {
+        resolver.runReverseDNS()
     }
 
     /// Best available TXT record — resolved data takes priority over browse data.

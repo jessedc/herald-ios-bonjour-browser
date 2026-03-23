@@ -11,6 +11,7 @@ final class MatterDeviceService: ObservableObject, UITestingConfigurable {
 
     private var tcpBrowser: ServiceInstanceBrowser?
     private var udpBrowser: ServiceInstanceBrowser?
+    private var operationalBrowser: ServiceInstanceBrowser?
     private var pollingTask: Task<Void, Never>?
     private let dnssd = DNSSDService.shared
 
@@ -19,6 +20,8 @@ final class MatterDeviceService: ObservableObject, UITestingConfigurable {
     }
 
     func startDiscovery() {
+        guard !isSearching else { return }
+
         switch UITestingMode.current {
         case .errors:
             applyMatterErrors()
@@ -33,27 +36,42 @@ final class MatterDeviceService: ObservableObject, UITestingConfigurable {
             break
         }
 
-        logger.info("startDiscovery: browsing _matter._tcp and _matter._udp in local.")
+        logger.info("startDiscovery: browsing _matter._tcp, _matter._udp, and _matterd._udp in local.")
         let tcp = ServiceInstanceBrowser()
         let udp = ServiceInstanceBrowser()
+        let operational = ServiceInstanceBrowser()
         tcpBrowser = tcp
         udpBrowser = udp
+        operationalBrowser = operational
         isSearching = true
         tcp.start(type: "_matter._tcp", domain: "local.")
         udp.start(type: "_matter._udp", domain: "local.")
+        operational.start(type: "_matterd._udp", domain: "local.")
 
         pollingTask = Task {
             var lastTcpCount = 0
             var lastUdpCount = 0
+            var lastOperationalCount = 0
             while !Task.isCancelled {
                 try? await Task.sleep(for: .milliseconds(500))
                 let tcpInstances = tcp.instances
                 let udpInstances = udp.instances
-                if tcpInstances.count != lastTcpCount || udpInstances.count != lastUdpCount {
-                    logger.info("startDiscovery: matter device count changed tcp=\(tcpInstances.count) udp=\(udpInstances.count)")
+                let operationalInstances = operational.instances
+                if tcpInstances.count != lastTcpCount
+                    || udpInstances.count != lastUdpCount
+                    || operationalInstances.count != lastOperationalCount {
+                    let tcpCount = tcpInstances.count
+                    let udpCount = udpInstances.count
+                    let opCount = operationalInstances.count
+                    logger.info("startDiscovery: matter count changed tcp=\(tcpCount) udp=\(udpCount) op=\(opCount)")
                     lastTcpCount = tcpInstances.count
                     lastUdpCount = udpInstances.count
-                    await resolveAndUpdateDevices(tcpInstances: tcpInstances, udpInstances: udpInstances)
+                    lastOperationalCount = operationalInstances.count
+                    await resolveAndUpdateDevices(
+                        tcpInstances: tcpInstances,
+                        udpInstances: udpInstances,
+                        operationalInstances: operationalInstances
+                    )
                 }
             }
         }
@@ -71,11 +89,17 @@ final class MatterDeviceService: ObservableObject, UITestingConfigurable {
         tcpBrowser = nil
         udpBrowser?.stop()
         udpBrowser = nil
+        operationalBrowser?.stop()
+        operationalBrowser = nil
         isSearching = false
     }
 
-    private func resolveAndUpdateDevices(tcpInstances: [ServiceInstance], udpInstances: [ServiceInstance]) async {
-        let allInstances = tcpInstances + udpInstances
+    private func resolveAndUpdateDevices(
+        tcpInstances: [ServiceInstance],
+        udpInstances: [ServiceInstance],
+        operationalInstances: [ServiceInstance]
+    ) async {
+        let allInstances = tcpInstances + udpInstances + operationalInstances
         let dnssd = self.dnssd
         let resolved: [MatterDevice] = await withTaskGroup(of: MatterDevice.self) { group in
             for instance in allInstances {
@@ -86,6 +110,20 @@ final class MatterDeviceService: ObservableObject, UITestingConfigurable {
                     do {
                         let result = try await dnssd.resolve(name: name, type: type, domain: domain)
                         let txt = result.txtRecord
+
+                        // Resolve IP addresses from hostname
+                        var addressList: [String] = []
+                        if !result.hostname.isEmpty {
+                            do {
+                                let addrs = try await dnssd.getAddresses(hostname: result.hostname)
+                                addressList = addrs.ipv4 + addrs.ipv6
+                            } catch {
+                                logger.warning(
+                                    "resolveAndUpdateDevices: address lookup failed for '\(result.hostname)': \(error.localizedDescription)"
+                                )
+                            }
+                        }
+
                         return MatterDevice(
                             name: name,
                             serviceType: type,
@@ -100,7 +138,7 @@ final class MatterDeviceService: ObservableObject, UITestingConfigurable {
                             isICD: txt["ICD"],
                             pairingHint: txt["PH"],
                             hostname: result.hostname,
-                            addresses: []
+                            addresses: addressList
                         )
                     } catch {
                         logger.warning("resolveAndUpdateDevices: failed to resolve '\(name)': \(error.localizedDescription)")
@@ -154,8 +192,26 @@ final class MatterDeviceService: ObservableObject, UITestingConfigurable {
     }
 
     private func applyMockMatterDevices() {
-        logger.info("startDiscovery: UI testing mode - injecting mock matter device")
+        logger.info("startDiscovery: UI testing mode - injecting mock matter devices")
         devices = [
+            // Operational device (hex instance name with fabric-node format)
+            MatterDevice(
+                name: "38271586BF3DEB06-00000000082931E5",
+                serviceType: "_matterd._udp",
+                discriminator: nil,
+                vendorProductID: nil,
+                commissioningMode: nil,
+                deviceType: nil,
+                deviceName: nil,
+                sessionIdleInterval: "500",
+                sessionActiveInterval: "300",
+                tcpSupported: nil,
+                isICD: "0",
+                pairingHint: nil,
+                hostname: "test-matter-node.local.",
+                addresses: ["192.168.1.50"]
+            ),
+            // Commissionable device
             MatterDevice(
                 name: "Test Matter Device",
                 serviceType: "_matter._tcp",
@@ -170,7 +226,7 @@ final class MatterDeviceService: ObservableObject, UITestingConfigurable {
                 isICD: "0",
                 pairingHint: "33",
                 hostname: "test-matter.local.",
-                addresses: ["192.168.1.50"]
+                addresses: ["192.168.1.51"]
             )
         ]
         isSearching = false

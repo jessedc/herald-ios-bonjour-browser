@@ -19,6 +19,13 @@ enum ServiceExporter {
             lines.append("IPv6: \(service.ipv6Addresses.joined(separator: ", "))")
         }
 
+        if !service.reverseDNS.isEmpty {
+            lines.append("Reverse DNS:")
+            for (ip, hostname) in service.reverseDNS.sorted(by: { $0.key < $1.key }) {
+                lines.append("  \(ip) → \(hostname)")
+            }
+        }
+
         if !service.txtRecord.isEmpty {
             lines.append("TXT Record:")
             for (key, value) in service.txtRecord.sorted(by: { $0.key < $1.key }) {
@@ -30,7 +37,7 @@ enum ServiceExporter {
     }
 
     static func json(for service: ResolvedService) -> String {
-        let dict: [String: Any] = [
+        var dict: [String: Any] = [
             "name": service.name,
             "type": service.type,
             "domain": service.domain,
@@ -41,6 +48,9 @@ enum ServiceExporter {
             "txtRecord": service.txtRecord,
             "resolvedAt": ISO8601DateFormatter().string(from: service.resolvedAt)
         ]
+        if !service.reverseDNS.isEmpty {
+            dict["reverseDNS"] = service.reverseDNS
+        }
         guard let data = try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .sortedKeys]),
               let str = String(data: data, encoding: .utf8) else {
             return "{}"

@@ -51,8 +51,10 @@
 		200000000000000000000060 /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000060 /* InfoView.swift */; };
 		200000000000000000000061 /* InfoDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000061 /* InfoDetailView.swift */; };
 		200000000000000000000062 /* ScreenshotMockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000062 /* ScreenshotMockData.swift */; };
+		200000000000000000000080 /* DNSSDServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000080 /* DNSSDServiceTests.swift */; };
 		88832DDE2F5C894600410D42 /* ServiceEnrichmentSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88832DDD2F5C894600410D42 /* ServiceEnrichmentSection.swift */; };
 		88A849D72F48D7CD0014A1AC /* LiveNetworkNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A849D62F48D7CD0014A1AC /* LiveNetworkNavigationTests.swift */; };
+		200000000000000000000090 /* ReverseDNSInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000090 /* ReverseDNSInfoView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -123,6 +125,8 @@
 		100000000000000000000061 /* InfoDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoDetailView.swift; sourceTree = "<group>"; };
 		100000000000000000000062 /* ScreenshotMockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotMockData.swift; sourceTree = "<group>"; };
 		100000000000000000000070 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		100000000000000000000080 /* DNSSDServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSSDServiceTests.swift; sourceTree = "<group>"; };
+		100000000000000000000090 /* ReverseDNSInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReverseDNSInfoView.swift; sourceTree = "<group>"; };
 		880233C22F41086E003649B8 /* AppStore Screenshots.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "AppStore Screenshots.xctestplan"; sourceTree = "<group>"; };
 		880233C32F41088D003649B8 /* UnitTestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = UnitTestPlan.xctestplan; sourceTree = "<group>"; };
 		88832DDD2F5C894600410D42 /* ServiceEnrichmentSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceEnrichmentSection.swift; sourceTree = "<group>"; };
@@ -272,6 +276,7 @@
 			children = (
 				100000000000000000000017 /* AllServicesView.swift */,
 				100000000000000000000015 /* ServiceDetailView.swift */,
+				100000000000000000000090 /* ReverseDNSInfoView.swift */,
 			);
 			path = AllServices;
 			sourceTree = "<group>";
@@ -355,6 +360,7 @@
 			isa = PBXGroup;
 			children = (
 				100000000000000000000050 /* ServiceExporterTests.swift */,
+				100000000000000000000080 /* DNSSDServiceTests.swift */,
 			);
 			path = HeraldTests;
 			sourceTree = "<group>";
@@ -537,6 +543,7 @@
 				200000000000000000000044 /* MatterDeviceView.swift in Sources */,
 				200000000000000000000060 /* InfoView.swift in Sources */,
 				200000000000000000000061 /* InfoDetailView.swift in Sources */,
+				200000000000000000000090 /* ReverseDNSInfoView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -556,6 +563,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				200000000000000000000050 /* ServiceExporterTests.swift in Sources */,
+				200000000000000000000080 /* DNSSDServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -716,7 +724,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -744,7 +752,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

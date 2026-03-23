@@ -164,9 +164,12 @@ struct ThreadNetworkView: View {
                 viewModel.refresh()
             }
             .onAppear { viewModel.start() }
-            .onDisappear { viewModel.stop() }
             .onChange(of: scenePhase) { _, newPhase in
-                if newPhase == .active { viewModel.refresh() }
+                switch newPhase {
+                case .active: viewModel.start()
+                case .background: viewModel.stop()
+                default: break
+                }
             }
         }
     }

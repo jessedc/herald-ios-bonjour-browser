@@ -17,6 +17,9 @@ final class ServiceResolver: ObservableObject, UITestingConfigurable {
     @Published private(set) var resolved: ResolvedService?
     @Published private(set) var isResolving = false
     @Published private(set) var error: String?
+    @Published private(set) var reverseDNS: [String: String] = [:]
+    @Published private(set) var isLookingUpReverseDNS = false
+    @Published private(set) var didRunReverseDNS = false
 
     var errors: [DiscoveryError] {
         if let error {
@@ -36,9 +39,13 @@ final class ServiceResolver: ObservableObject, UITestingConfigurable {
     func resolve(instance: ServiceInstance) {
         logger.info("resolve: starting for '\(instance.name)' type='\(instance.type)' domain='\(instance.domain)'")
         resolveTask?.cancel()
+        reverseDNSTask?.cancel()
         isResolving = true
         error = nil
         resolved = nil
+        reverseDNS = [:]
+        isLookingUpReverseDNS = false
+        didRunReverseDNS = false
         currentInstance = instance
 
         if applyUITestingOverrides() { return }
@@ -97,6 +104,78 @@ final class ServiceResolver: ObservableObject, UITestingConfigurable {
         isResolving = false
     }
 
+    // MARK: - Reverse DNS (on-demand)
+
+    private var reverseDNSTask: Task<Void, Never>?
+
+    /// Run PTR lookups for all resolved IP addresses. Call after resolve() completes.
+    func runReverseDNS() {
+        guard let resolved = resolved else { return }
+        reverseDNSTask?.cancel()
+        isLookingUpReverseDNS = true
+        reverseDNS = [:]
+
+        reverseDNSTask = Task {
+            logger.info("runReverseDNS: starting PTR lookups for \(resolved.ipv4Addresses.count + resolved.ipv6Addresses.count) addresses")
+            let results = await Self.lookupReverseDNS(
+                ipv4: resolved.ipv4Addresses,
+                ipv6: resolved.ipv6Addresses,
+                dnssd: dnssd
+            )
+
+            guard !Task.isCancelled else { return }
+
+            reverseDNS = results
+            // Update the resolved service with PTR results for export
+            self.resolved = ResolvedService(
+                name: resolved.name,
+                type: resolved.type,
+                domain: resolved.domain,
+                hostname: resolved.hostname,
+                port: resolved.port,
+                ipv4Addresses: resolved.ipv4Addresses,
+                ipv6Addresses: resolved.ipv6Addresses,
+                txtRecord: resolved.txtRecord,
+                reverseDNS: results,
+                resolvedAt: resolved.resolvedAt
+            )
+            logger.info("runReverseDNS: complete — \(results.count) PTR records found")
+            isLookingUpReverseDNS = false
+            didRunReverseDNS = true
+        }
+    }
+
+    private static func lookupReverseDNS(
+        ipv4: [String],
+        ipv6: [String],
+        dnssd: DNSSDService
+    ) async -> [String: String] {
+        await withTaskGroup(of: (String, String?).self) { group in
+            for addr in ipv4 {
+                group.addTask {
+                    guard let reverseName = DNSSDService.reverseDNSName(ipv4: addr) else { return (addr, nil) }
+                    let result = try? await dnssd.queryPTR(name: reverseName)
+                    return (addr, result)
+                }
+            }
+            for addr in ipv6 {
+                group.addTask {
+                    let cleaned = addr.contains("%") ? String(addr.prefix(while: { $0 != "%" })) : addr
+                    guard let reverseName = DNSSDService.reverseDNSName(ipv6: cleaned) else { return (addr, nil) }
+                    let result = try? await dnssd.queryPTR(name: reverseName)
+                    return (addr, result)
+                }
+            }
+            var results: [String: String] = [:]
+            for await (addr, hostname) in group {
+                if let hostname = hostname {
+                    results[addr] = hostname
+                }
+            }
+            return results
+        }
+    }
+
     // MARK: - UITestingConfigurable
 
     func applyScreenshotMockData() {
@@ -121,6 +200,8 @@ final class ServiceResolver: ObservableObject, UITestingConfigurable {
             )
         }
         isResolving = false
+        reverseDNS = resolved?.reverseDNS ?? [:]
+        didRunReverseDNS = true
     }
 
     func applyUITestingMockData() {

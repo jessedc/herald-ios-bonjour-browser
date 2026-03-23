@@ -22,12 +22,13 @@ enum TXTRecordLabels {
         "dn": "Domain Name",
         "omr": "OMR Prefix",
         "rv": "Record Version",
+        "vp": "Vendor Product",                // Vendor-specific; observed on Apple border routers
     ]
 
     // MARK: - Matter (_matter._tcp, _matterc._udp, _matterd._udp)
     // Source: connectedhomeip src/lib/dnssd/TxtFields.h
     // https://github.com/project-chip/connectedhomeip/blob/master/src/lib/dnssd/TxtFields.h
-    // Commission keys (D, VP, CM, DT, DN, PH, PI, RI, CP): _matterc._udp and _matterd._udp only
+    // Commission keys (D, VP, CM, DT, DN, PH, PI, RI, CP): _matterc._udp, _matter._tcp, _matter._udp only
     // Common keys (SII, SAI, SAT, T, ICD): all three service types
 
     private static let matter: [String: String] = [
@@ -97,7 +98,11 @@ enum TXTRecordLabels {
         "psi": "System Pairing Identity",       // PublicCUSystemPairingIdentifier
         "rsf": "Required Sender Features",
         "serialNumber": "Serial Number",
-        "vv": "Vodka Version",                  // Apple internal codename; true purpose unknown
+        "vv": "AirPlay 2 Version",                // Apple internal codename "vodka"; typically value "2"
+        "fex": "Features (Extended)",              // Base64-encoded features in little-endian form (shairport-sync)
+        "act": "Unknown (act)",                    // Undocumented; observed on Apple AirPlay devices
+        "at": "Unknown (at)",                      // Undocumented; hex value observed on Apple AirPlay devices
+        "c": "Unknown (c)",                        // Undocumented; observed on Apple AirPlay devices
     ]
 
     // MARK: - HomeKit Accessory Protocol (_hap._tcp)
@@ -176,7 +181,7 @@ enum TXTRecordLabels {
         "fv": "Firmware Version",
         "ov": "OS Version",
         "sf": "Status Flags",
-        "vv": "Vodka Version",                   // Apple internal codename; true purpose unknown
+        "vv": "AirPlay 2 Version",                // Apple internal codename "vodka"; typically value "2"
     ]
 
     // MARK: - Device Info (_device-info._tcp)
@@ -207,6 +212,19 @@ enum TXTRecordLabels {
         "VERSION": "Version",
     ]
 
+    // MARK: - SRP Replication (_srpl-tls._tcp) — Service Registration Protocol over TLS
+    // Source: draft-ietf-dnssd-srp-replication (IETF)
+    // https://dnssd-wg.github.io/draft-ietf-dnssd-srp-replication/draft-ietf-dnssd-srp-replication.html
+    // xpanid and priority are Apple extensions not in the IETF draft.
+
+    private static let srplTls: [String: String] = [
+        "did": "Dataset ID",                      // 64-bit hex; establishes common SRP dataset
+        "dn": "Domain Name",                      // Domain this dataset represents
+        "pid": "Partner ID",                       // 64-bit hex; uniquely identifies SRP partner
+        "priority": "Priority",                    // Apple extension; server selection priority
+        "xpanid": "Extended PAN ID",              // Apple extension; Thread network identifier
+    ]
+
     // MARK: - Lookup by service type
 
     private static let labelsByServiceType: [String: [String: String]] = [
@@ -225,6 +243,7 @@ enum TXTRecordLabels {
         "_device-info._tcp": deviceInfo,
         "_remotepairing._tcp": remotePairing,
         "_spotify-connect._tcp": spotifyConnect,
+        "_srpl-tls._tcp": srplTls,
     ]
 
     static func label(for key: String, serviceType: String) -> String? {

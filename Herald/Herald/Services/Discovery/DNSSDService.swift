@@ -144,8 +144,10 @@ final class DNSSDService: @unchecked Sendable {
                 nonisolated(unsafe) let cleanupCtx = context
                 continuation.onTermination = { @Sendable [weak self] _ in
                     logger.info("browseInstances: stream terminated for type='\(type)' domain='\(domain)'")
-                    self?.queue.async { self?.releaseChildRef(cleanupRef) }
-                    Unmanaged<BrowseInstancesCallbackContext>.fromOpaque(cleanupCtx).release()
+                    self?.queue.async {
+                        self?.releaseChildRef(cleanupRef)
+                        Unmanaged<BrowseInstancesCallbackContext>.fromOpaque(cleanupCtx).release()
+                    }
                 }
             }
         }
@@ -377,6 +379,165 @@ final class DNSSDService: @unchecked Sendable {
             }
         }
     }
+    // MARK: - PTR (Reverse DNS) Lookup
+
+    /// Look up the PTR record for a reverse DNS name (e.g. "50.1.168.192.in-addr.arpa").
+    /// Returns the resolved hostname, or nil if no PTR record exists (which is normal).
+    /// Uses a 3-second timeout since this is supplementary data.
+    func queryPTR(name: String) async throws -> String? {
+        logger.info("queryPTR: starting lookup for '\(name)'")
+
+        guard let parentRef = self.sharedRef else {
+            throw DNSSDError.connectionUnavailable
+        }
+
+        nonisolated(unsafe) let capturedParentRef = parentRef
+        return try await withCheckedThrowingContinuation { continuation in
+            self.queue.async {
+                var childRef: DNSServiceRef? = capturedParentRef
+
+                let context = Unmanaged.passRetained(
+                    PTRCallbackContext(continuation: continuation)
+                ).toOpaque()
+
+                let err = DNSServiceQueryRecord(
+                    &childRef,
+                    DNSServiceFlags(kDNSServiceFlagsShareConnection),
+                    0, // all interfaces
+                    name,
+                    UInt16(kDNSServiceType_PTR),
+                    UInt16(kDNSServiceClass_IN),
+                    { _, _, _, errorCode, _, _, _, rdlen, rdata, _, context in
+                        guard let context = context else { return }
+                        let ctx = Unmanaged<PTRCallbackContext>.fromOpaque(context)
+                            .takeUnretainedValue()
+
+                        guard !ctx.didResume else {
+                            logger.debug("queryPTR callback: ignoring duplicate callback")
+                            return
+                        }
+
+                        if errorCode != kDNSServiceErr_NoError {
+                            logger.info("queryPTR callback: error code \(errorCode) (no PTR record)")
+                            ctx.didResume = true
+                            ctx.continuation.resume(returning: nil)
+                            return
+                        }
+
+                        guard let rdata = rdata, rdlen > 0 else {
+                            logger.info("queryPTR callback: empty rdata")
+                            ctx.didResume = true
+                            ctx.continuation.resume(returning: nil)
+                            return
+                        }
+
+                        let hostname = DNSSDService.parseDNSName(
+                            from: rdata.assumingMemoryBound(to: UInt8.self),
+                            length: Int(rdlen)
+                        )
+                        logger.info("queryPTR callback: resolved to '\(hostname ?? "nil")'")
+                        ctx.didResume = true
+                        ctx.continuation.resume(returning: hostname)
+                    },
+                    context
+                )
+
+                guard err == kDNSServiceErr_NoError, let serviceRef = childRef else {
+                    logger.error("queryPTR: DNSServiceQueryRecord failed with error \(err)")
+                    Unmanaged<PTRCallbackContext>.fromOpaque(context).release()
+                    continuation.resume(returning: nil)
+                    return
+                }
+
+                logger.info("queryPTR: DNSServiceQueryRecord started successfully (3s timeout)")
+                self.trackChildRef(serviceRef)
+
+                nonisolated(unsafe) let cleanupRef = serviceRef
+                nonisolated(unsafe) let cleanupCtx = context
+                self.queue.asyncAfter(deadline: .now() + 3) { [weak self] in
+                    let ctx = Unmanaged<PTRCallbackContext>.fromOpaque(cleanupCtx)
+                        .takeUnretainedValue()
+                    if !ctx.didResume {
+                        logger.info("queryPTR: 3s timeout reached, no PTR record found")
+                        ctx.didResume = true
+                        ctx.continuation.resume(returning: nil)
+                    }
+                    self?.releaseChildRef(cleanupRef)
+                    Unmanaged<PTRCallbackContext>.fromOpaque(cleanupCtx).release()
+                }
+            }
+        }
+    }
+
+    // MARK: - DNS Name Parsing
+
+    /// Parse a DNS wire-format name (sequence of length-prefixed labels) into a dotted string.
+    /// Example: [3, 'f', 'o', 'o', 5, 'l', 'o', 'c', 'a', 'l', 0] → "foo.local."
+    static func parseDNSName(from data: UnsafePointer<UInt8>, length: Int) -> String? {
+        var labels: [String] = []
+        var offset = 0
+        while offset < length {
+            let labelLen = Int(data[offset])
+            offset += 1
+            if labelLen == 0 { break }
+            guard offset + labelLen <= length else { return nil }
+            let bytes = UnsafeBufferPointer(start: data.advanced(by: offset), count: labelLen)
+            guard let label = String(bytes: bytes, encoding: .utf8) else { return nil }
+            labels.append(label)
+            offset += labelLen
+        }
+        guard !labels.isEmpty else { return nil }
+        return labels.joined(separator: ".") + "."
+    }
+
+    // MARK: - Reverse DNS Name Construction
+
+    /// Convert an IPv4 address to its reverse DNS name.
+    /// Example: "192.168.1.50" → "50.1.168.192.in-addr.arpa"
+    static func reverseDNSName(ipv4: String) -> String? {
+        let parts = ipv4.split(separator: ".")
+        guard parts.count == 4, parts.allSatisfy({ UInt8($0) != nil }) else { return nil }
+        return parts.reversed().joined(separator: ".") + ".in-addr.arpa"
+    }
+
+    /// Convert an IPv6 address to its reverse DNS name.
+    /// Example: "fe80::1" → full nibble-reversed .ip6.arpa form.
+    /// Strips any %scope suffix before conversion.
+    static func reverseDNSName(ipv6: String) -> String? {
+        // Strip scope ID (e.g. %en0)
+        let cleaned = ipv6.contains("%") ? String(ipv6.prefix(while: { $0 != "%" })) : ipv6
+
+        // Split on "::" first to handle the compressed form
+        let halves = cleaned.components(separatedBy: "::")
+        guard halves.count <= 2 else { return nil }
+
+        let leftGroups = halves[0].isEmpty ? [] : halves[0].split(separator: ":").map(String.init)
+        let rightGroups = halves.count == 2
+            ? (halves[1].isEmpty ? [] : halves[1].split(separator: ":").map(String.init))
+            : []
+
+        let groups: [String]
+        if halves.count == 2 {
+            // Has "::" — fill missing groups with "0"
+            let missing = 8 - leftGroups.count - rightGroups.count
+            guard missing >= 0 else { return nil }
+            groups = leftGroups + Array(repeating: "0", count: missing) + rightGroups
+        } else {
+            groups = leftGroups
+        }
+
+        guard groups.count == 8 else { return nil }
+
+        // Pad each group to 4 hex digits and collect all nibbles
+        let nibbles = groups.flatMap { group -> [Character] in
+            let padded = String(repeating: "0", count: max(0, 4 - group.count)) + group
+            return Array(padded)
+        }
+
+        guard nibbles.count == 32 else { return nil }
+
+        return nibbles.reversed().map(String.init).joined(separator: ".") + ".ip6.arpa"
+    }
 }
 
 // MARK: - Browse Event
@@ -406,6 +567,14 @@ private final class ResolveCallbackContext {
     }
 }
 
+private final class PTRCallbackContext {
+    let continuation: CheckedContinuation<String?, Error>
+    var didResume = false
+    init(continuation: CheckedContinuation<String?, Error>) {
+        self.continuation = continuation
+    }
+}
+
 private final class AddressCallbackContext {
     let continuation: CheckedContinuation<(ipv4: [String], ipv6: [String]), Error>
     var ipv4: [String] = []
@@ -423,6 +592,7 @@ enum DNSSDError: LocalizedError {
     case addressLookupFailed(Int)
     case connectionUnavailable
     case instanceBrowseFailed(Int)
+    case ptrLookupFailed(Int)
 
     var errorDescription: String? {
         switch self {
@@ -434,6 +604,8 @@ enum DNSSDError: LocalizedError {
             return "DNS-SD shared connection is unavailable"
         case .instanceBrowseFailed(let code):
             return "DNS-SD instance browse failed with error code \(code)"
+        case .ptrLookupFailed(let code):
+            return "DNS-SD PTR lookup failed with error code \(code)"
         }
     }
 }

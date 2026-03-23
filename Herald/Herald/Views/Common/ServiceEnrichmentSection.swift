@@ -7,7 +7,7 @@ struct ServiceEnrichmentSection: View {
         switch instance.type {
         case "_meshcop._udp":
             threadSection
-        case "_matter._tcp", "_matter._udp":
+        case "_matter._tcp", "_matter._udp", "_matterd._udp":
             matterSection
         case "_matterc._udp":
             matterCommissionerSection
@@ -58,7 +58,12 @@ struct ServiceEnrichmentSection: View {
     @ViewBuilder
     private var matterSection: some View {
         let txt = instance.txtRecord
-        Section("Matter Device") {
+        let parsed = MatterInstanceName.parse(instance.name)
+        Section(parsed != nil ? "Matter Operational Device" : "Matter Device") {
+            if let parsed {
+                LabeledRow(label: "Fabric ID", value: parsed.fabricID)
+                LabeledRow(label: "Node ID", value: parsed.truncatedNodeID)
+            }
             if let vp = txt["VP"] {
                 let vendorName = MatterVendorIDs.vendorName(for: vp)
                 LabeledRow(label: "Vendor / Product", value: vendorName.map { "\(vp) (\($0))" } ?? vp)
@@ -75,6 +80,21 @@ struct ServiceEnrichmentSection: View {
             }
             if let cm = txt["CM"] {
                 LabeledRow(label: "Commissioning Mode", value: MatterDevice.commissioningModeDescription(cm))
+            }
+            if let hints = MatterDevice.decodePairingHint(txt["PH"]) {
+                LabeledRow(label: "Pairing Hints", value: hints.joined(separator: ", "))
+            }
+            if txt["ICD"] == "1" {
+                LabeledRow(label: "Intermittent Device (ICD)", value: "Yes (Battery / Sleepy)")
+            }
+            if let sii = MatterDevice.humanizeInterval(txt["SII"]) {
+                LabeledRow(label: "Session Idle Interval", value: sii)
+            }
+            if let sai = MatterDevice.humanizeInterval(txt["SAI"]) {
+                LabeledRow(label: "Session Active Interval", value: sai)
+            }
+            if let t = txt["T"] {
+                LabeledRow(label: "TCP Supported", value: t == "1" ? "Yes" : "No")
             }
         }
     }

@@ -85,9 +85,9 @@ struct InfoDetailView: View {
                         + "making them discoverable on the wider network."
                 ),
                 QueryInfo(
-                    label: "Matter Commissioners",
+                    label: "Matter Commissionable",
                     type: "_matterc._udp.local.",
-                    description: "Discovers Matter commissioner devices on the Thread network. "
+                    description: "Discovers Matter devices in commissioning mode (ready to be paired). "
                         + "TXT records provide device name (DN), vendor/product ID (VP), "
                         + "device type (DT), and commissioning mode (CM)."
                 ),
@@ -95,18 +95,28 @@ struct InfoDetailView: View {
         case .matter:
             return [
                 QueryInfo(
-                    label: "Matter over TCP",
+                    label: "Commissionable (TCP)",
                     type: "_matter._tcp.local.",
-                    description: "Discovers Matter smart home devices advertising over TCP. "
+                    description: "Discovers commissionable Matter devices advertising over TCP. "
                         + "TXT records provide discriminator (D), vendor/product ID (VP), "
-                        + "commissioning mode (CM), device type (DT), and device name (DN)."
+                        + "commissioning mode (CM), device type (DT), device name (DN), "
+                        + "session intervals (SII/SAI), and pairing hint (PH). "
+                        + "Vendor IDs and device types are enriched with human-readable names."
                 ),
                 QueryInfo(
-                    label: "Matter over UDP",
+                    label: "Commissionable (UDP)",
                     type: "_matter._udp.local.",
-                    description: "Discovers Matter smart home devices advertising over UDP. "
+                    description: "Discovers commissionable Matter devices advertising over UDP. "
                         + "Uses the same TXT record fields as TCP. UDP is the primary transport "
                         + "for Matter devices on Thread and Wi-Fi networks."
+                ),
+                QueryInfo(
+                    label: "Operational Devices",
+                    type: "_matterd._udp.local.",
+                    description: "Discovers operational Matter devices already commissioned into a fabric. "
+                        + "Instance names follow the format {fabric-id}-{node-id} (hex), which Herald "
+                        + "parses to group devices by fabric. TXT records include session parameters "
+                        + "(SII, SAI, T, ICD) but not commissioning fields like D, VP, or DN."
                 ),
             ]
         }

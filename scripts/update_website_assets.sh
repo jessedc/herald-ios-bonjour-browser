@@ -10,6 +10,9 @@
 
 set -euo pipefail
 
+# pngcrush -ow leaves a temp "pngout.png" in the cwd; clean it up on exit
+trap 'rm -f pngout.png' EXIT
+
 PNGCRUSH="$(xcrun --find pngcrush 2>/dev/null || true)"
 if [ -z "$PNGCRUSH" ]; then
   echo "Error: pngcrush not found. Install Xcode or Xcode Command Line Tools." >&2

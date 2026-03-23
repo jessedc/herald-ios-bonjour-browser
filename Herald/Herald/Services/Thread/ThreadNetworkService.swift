@@ -5,7 +5,7 @@ private let logger = Logger(subsystem: "com.herald", category: "ThreadNetworkSer
 
 /// Discovers Thread network devices via Bonjour browse:
 /// border routers (_meshcop._udp), TREL peers (_trel._udp),
-/// SRP servers (_srpl-tls._tcp), and Matter commissioners (_matterc._udp).
+/// SRP servers (_srpl-tls._tcp), and Matter commissionable devices (_matterc._udp).
 @MainActor
 final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
     @Published private(set) var borderRouters: [ThreadBorderRouter] = []
@@ -27,6 +27,8 @@ final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
     }
 
     func startDiscovery() {
+        guard !isSearching else { return }
+
         switch UITestingMode.current {
         case .errors:
             applyThreadErrors()

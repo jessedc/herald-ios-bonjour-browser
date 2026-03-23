@@ -167,6 +167,9 @@ enum ScreenshotMockData {
             "Color": "T",
             "Duplex": "T"
         ],
+        reverseDNS: [
+            "10.0.1.42": "HP-LaserJet-Pro.local."
+        ],
         resolvedAt: Date()
     )
 
@@ -266,12 +269,62 @@ enum ScreenshotMockData {
     // MARK: - Matter Devices
 
     static let matterDevices: [MatterDevice] = [
+        // Operational devices on Fabric A (hex instance names)
+        MatterDevice(
+            name: "38271586BF3DEB06-0000000008293A1E",
+            serviceType: "_matterd._udp",
+            discriminator: nil,
+            vendorProductID: nil,
+            commissioningMode: nil,
+            deviceType: nil,
+            deviceName: nil,
+            sessionIdleInterval: "500",
+            sessionActiveInterval: "300",
+            tcpSupported: nil,
+            isICD: "0",
+            pairingHint: nil,
+            hostname: "Nanoleaf-Strip-A087.local.",
+            addresses: ["10.0.1.50", "fe80::1a2b:3c4d:5e6f:2001"]
+        ),
+        MatterDevice(
+            name: "38271586BF3DEB06-0000000008293B2F",
+            serviceType: "_matterd._udp",
+            discriminator: nil,
+            vendorProductID: nil,
+            commissioningMode: nil,
+            deviceType: nil,
+            deviceName: nil,
+            sessionIdleInterval: "5000",
+            sessionActiveInterval: "300",
+            tcpSupported: nil,
+            isICD: "1",
+            pairingHint: nil,
+            hostname: "Eve-Room-B204.local.",
+            addresses: ["10.0.1.51", "fe80::1a2b:3c4d:5e6f:2002"]
+        ),
+        MatterDevice(
+            name: "38271586BF3DEB06-0000000008293C40",
+            serviceType: "_matterd._udp",
+            discriminator: nil,
+            vendorProductID: nil,
+            commissioningMode: nil,
+            deviceType: nil,
+            deviceName: nil,
+            sessionIdleInterval: "500",
+            sessionActiveInterval: "300",
+            tcpSupported: nil,
+            isICD: "0",
+            pairingHint: nil,
+            hostname: "Eve-Energy-C310.local.",
+            addresses: ["10.0.1.52", "fe80::1a2b:3c4d:5e6f:2003"]
+        ),
+        // Commissionable device (human-readable name, full TXT data)
         MatterDevice(
             name: "Nanoleaf Strip A087",
             serviceType: "_matter._tcp",
             discriminator: "2976",
             vendorProductID: "4448+2",
-            commissioningMode: "0",
+            commissioningMode: "1",
             deviceType: "268",
             deviceName: "Light Strip",
             sessionIdleInterval: "500",
@@ -282,6 +335,7 @@ enum ScreenshotMockData {
             hostname: "Nanoleaf-Strip-A087.local.",
             addresses: ["10.0.1.50", "fe80::1a2b:3c4d:5e6f:2001"]
         ),
+        // Another commissionable device (battery-powered)
         MatterDevice(
             name: "Eve Room B204",
             serviceType: "_matter._tcp",
@@ -297,22 +351,6 @@ enum ScreenshotMockData {
             pairingHint: "33",
             hostname: "Eve-Room-B204.local.",
             addresses: ["10.0.1.51", "fe80::1a2b:3c4d:5e6f:2002"]
-        ),
-        MatterDevice(
-            name: "Eve Energy C310",
-            serviceType: "_matter._tcp",
-            discriminator: "3840",
-            vendorProductID: "4874+50",
-            commissioningMode: "0",
-            deviceType: "266",
-            deviceName: "Smart Plug",
-            sessionIdleInterval: "500",
-            sessionActiveInterval: "300",
-            tcpSupported: "0",
-            isICD: "0",
-            pairingHint: "33",
-            hostname: "Eve-Energy-C310.local.",
-            addresses: ["10.0.1.52", "fe80::1a2b:3c4d:5e6f:2003"]
         )
     ]
 }

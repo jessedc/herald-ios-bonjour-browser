@@ -66,6 +66,50 @@ struct ServiceDetailView: View {
                         }
                     }
                 }
+
+                // Reverse DNS (on-demand)
+                Section {
+                    if viewModel.isLookingUpReverseDNS {
+                        HStack {
+                            ProgressView()
+                            Text("Looking up PTR records…")
+                                .foregroundStyle(.secondary)
+                        }
+                    } else if viewModel.reverseDNS.isEmpty && viewModel.didRunReverseDNS {
+                        Text("No PTR records found")
+                            .foregroundStyle(.secondary)
+                    }
+
+                    ForEach(
+                        viewModel.reverseDNS.sorted(by: { $0.key < $1.key }),
+                        id: \.key
+                    ) { ip, hostname in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(ip)
+                                .font(.system(.body, design: .monospaced))
+                            Text(hostname)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    if !viewModel.didRunReverseDNS && !viewModel.isLookingUpReverseDNS {
+                        Button("Run Reverse DNS Lookup") {
+                            viewModel.runReverseDNS()
+                        }
+                    }
+                } header: {
+                    HStack {
+                        Text("Reverse DNS")
+                        Spacer()
+                        NavigationLink(value: ReverseDNSInfoDestination()) {
+                            Image(systemName: "info.circle")
+                                .font(.body)
+                                .textCase(nil)
+                        }
+                        .accessibilityIdentifier("detail.reverseDNSInfo")
+                    }
+                }
             }
 
             // TXT Record
@@ -89,9 +133,14 @@ struct ServiceDetailView: View {
         }
         .navigationTitle(viewModel.instance.name)
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(for: ReverseDNSInfoDestination.self) { _ in
+            ReverseDNSInfoView()
+        }
         .exportable(title: viewModel.exportTitle, text: { viewModel.exportText }, json: { viewModel.exportJSON ?? "" })
         .onAppear {
             viewModel.resolve()
         }
     }
 }
+
+struct ReverseDNSInfoDestination: Hashable {}

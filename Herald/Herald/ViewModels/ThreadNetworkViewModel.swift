@@ -23,6 +23,7 @@ final class ThreadNetworkViewModel: ObservableObject, TextExportable {
     }
 
     func start() {
+        guard !service.isSearching else { return }
         logger.info("start: starting Thread network discovery")
         clearErrors()
         service.startDiscovery()

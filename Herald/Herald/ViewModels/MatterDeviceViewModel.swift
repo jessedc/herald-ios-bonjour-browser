@@ -4,6 +4,13 @@ import os
 
 private let logger = Logger(subsystem: "com.herald", category: "MatterDeviceViewModel")
 
+struct MatterDeviceFabricGroup: Identifiable {
+    let fabricID: String?
+    let devices: [MatterDevice]
+
+    var id: String { fabricID ?? "ungrouped" }
+}
+
 @MainActor
 final class MatterDeviceViewModel: ObservableObject, TextExportable {
     @Published var service = MatterDeviceService()
@@ -17,11 +24,40 @@ final class MatterDeviceViewModel: ObservableObject, TextExportable {
 
     var errors: [DiscoveryError] { service.errors }
 
+    /// Groups devices by fabric ID; commissionable/unparseable devices go in a nil-fabric group
+    var devicesByFabric: [MatterDeviceFabricGroup] {
+        var fabricMap: [String: [MatterDevice]] = [:]
+        var ungrouped: [MatterDevice] = []
+
+        for device in service.devices {
+            if let fabricID = device.parsedInstanceName?.fabricID {
+                fabricMap[fabricID, default: []].append(device)
+            } else {
+                ungrouped.append(device)
+            }
+        }
+
+        var groups: [MatterDeviceFabricGroup] = fabricMap
+            .sorted { $0.key < $1.key }
+            .map { MatterDeviceFabricGroup(fabricID: $0.key, devices: $0.value) }
+
+        if !ungrouped.isEmpty {
+            groups.append(MatterDeviceFabricGroup(fabricID: nil, devices: ungrouped))
+        }
+
+        return groups
+    }
+
+    var fabricCount: Int {
+        Set(service.devices.compactMap { $0.parsedInstanceName?.fabricID }).count
+    }
+
     func clearErrors() {
         service.clearErrors()
     }
 
     func start() {
+        guard !service.isSearching else { return }
         logger.info("start: starting Matter device discovery")
         clearErrors()
         service.startDiscovery()

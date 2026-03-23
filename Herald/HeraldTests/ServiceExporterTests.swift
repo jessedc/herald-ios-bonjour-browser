@@ -99,6 +99,86 @@ final class ServiceExporterTests: XCTestCase {
         XCTAssertNotNil(parsed["resolvedAt"])
     }
 
+    // MARK: - ResolvedService Reverse DNS
+
+    func testResolvedServicePlainTextIncludesReverseDNS() {
+        let service = ResolvedService(
+            name: "Test",
+            type: "_http._tcp",
+            domain: "local.",
+            hostname: "test.local.",
+            port: 80,
+            ipv4Addresses: ["192.168.1.50"],
+            ipv6Addresses: [],
+            txtRecord: [:],
+            reverseDNS: ["192.168.1.50": "myhost.example.com."],
+            resolvedAt: Date()
+        )
+        let text = ServiceExporter.plainText(for: service)
+
+        XCTAssertTrue(text.contains("Reverse DNS:"))
+        XCTAssertTrue(text.contains("192.168.1.50 → myhost.example.com."))
+    }
+
+    func testResolvedServicePlainTextOmitsEmptyReverseDNS() {
+        let service = ResolvedService(
+            name: "Test",
+            type: "_http._tcp",
+            domain: "local.",
+            hostname: "test.local.",
+            port: 80,
+            ipv4Addresses: ["192.168.1.50"],
+            ipv6Addresses: [],
+            txtRecord: [:],
+            resolvedAt: Date()
+        )
+        let text = ServiceExporter.plainText(for: service)
+
+        XCTAssertFalse(text.contains("Reverse DNS"))
+    }
+
+    func testResolvedServiceJSONIncludesReverseDNS() {
+        let service = ResolvedService(
+            name: "Test",
+            type: "_http._tcp",
+            domain: "local.",
+            hostname: "test.local.",
+            port: 80,
+            ipv4Addresses: ["10.0.0.1"],
+            ipv6Addresses: [],
+            txtRecord: [:],
+            reverseDNS: ["10.0.0.1": "server.local."],
+            resolvedAt: Date()
+        )
+        let json = ServiceExporter.json(for: service)
+
+        let data = json.data(using: .utf8)!
+        let parsed = try! JSONSerialization.jsonObject(with: data) as! [String: Any]
+
+        let rdns = parsed["reverseDNS"] as? [String: String]
+        XCTAssertEqual(rdns?["10.0.0.1"], "server.local.")
+    }
+
+    func testResolvedServiceJSONOmitsEmptyReverseDNS() {
+        let service = ResolvedService(
+            name: "Test",
+            type: "_http._tcp",
+            domain: "local.",
+            hostname: "test.local.",
+            port: 80,
+            ipv4Addresses: [],
+            ipv6Addresses: [],
+            txtRecord: [:],
+            resolvedAt: Date()
+        )
+        let json = ServiceExporter.json(for: service)
+
+        let data = json.data(using: .utf8)!
+        let parsed = try! JSONSerialization.jsonObject(with: data) as! [String: Any]
+
+        XCTAssertNil(parsed["reverseDNS"])
+    }
+
     // MARK: - ServiceInstance List Plain Text
 
     func testInstanceListPlainTextGroupsByType() {

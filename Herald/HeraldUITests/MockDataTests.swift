@@ -329,7 +329,7 @@ final class MockDataTests: XCTestCase {
         let navBar = app.navigationBars["Matter Devices"]
         XCTAssertTrue(navBar.waitForExistence(timeout: 1))
 
-        let deviceRow = app.staticTexts["Test Matter Device"]
+        let deviceRow = app.staticTexts["Test Light"]
         XCTAssertTrue(
             deviceRow.waitForExistence(timeout: 1),
             "Mock matter device should appear"
@@ -342,11 +342,11 @@ final class MockDataTests: XCTestCase {
         XCTAssertTrue(navBar.waitForExistence(timeout: 1))
 
         XCTAssertTrue(
-            app.staticTexts["Test Matter Device"].waitForExistence(timeout: 1),
+            app.staticTexts["Test Light"].waitForExistence(timeout: 1),
             "Device name should appear"
         )
 
-        let deviceRow = app.cells.containing(.staticText, identifier: "Test Matter Device").firstMatch
+        let deviceRow = app.cells.containing(.staticText, identifier: "Test Light").firstMatch
         XCTAssertTrue(deviceRow.exists, "Device row should exist")
 
         let serviceTypeLabel = deviceRow.staticTexts["Service"]
