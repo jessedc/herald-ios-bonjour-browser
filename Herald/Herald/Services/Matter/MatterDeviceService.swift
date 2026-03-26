@@ -111,19 +111,6 @@ final class MatterDeviceService: ObservableObject, UITestingConfigurable {
                         let result = try await dnssd.resolve(name: name, type: type, domain: domain)
                         let txt = result.txtRecord
 
-                        // Resolve IP addresses from hostname
-                        var addressList: [String] = []
-                        if !result.hostname.isEmpty {
-                            do {
-                                let addrs = try await dnssd.getAddresses(hostname: result.hostname)
-                                addressList = addrs.ipv4 + addrs.ipv6
-                            } catch {
-                                logger.warning(
-                                    "resolveAndUpdateDevices: address lookup failed for '\(result.hostname)': \(error.localizedDescription)"
-                                )
-                            }
-                        }
-
                         return MatterDevice(
                             name: name,
                             serviceType: type,
@@ -138,7 +125,7 @@ final class MatterDeviceService: ObservableObject, UITestingConfigurable {
                             isICD: txt["ICD"],
                             pairingHint: txt["PH"],
                             hostname: result.hostname,
-                            addresses: addressList
+                            addresses: []
                         )
                     } catch {
                         logger.warning("resolveAndUpdateDevices: failed to resolve '\(name)': \(error.localizedDescription)")

@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		200000000000000000000001 /* HeraldApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000001 /* HeraldApp.swift */; };
 		200000000000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000002 /* ContentView.swift */; };
+		2000000000000000000000B3 /* NavigationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000B3 /* NavigationState.swift */; };
+		2000000000000000000000B4 /* AppShortcutInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000B4 /* AppShortcutInfoView.swift */; };
 		200000000000000000000005 /* ServiceInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000005 /* ServiceInstance.swift */; };
 		200000000000000000000006 /* ResolvedService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000006 /* ResolvedService.swift */; };
 		200000000000000000000007 /* ThreadNetworkInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000007 /* ThreadNetworkInfo.swift */; };
@@ -52,9 +54,17 @@
 		200000000000000000000061 /* InfoDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000061 /* InfoDetailView.swift */; };
 		200000000000000000000062 /* ScreenshotMockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000062 /* ScreenshotMockData.swift */; };
 		200000000000000000000080 /* DNSSDServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000080 /* DNSSDServiceTests.swift */; };
+		200000000000000000000090 /* ReverseDNSInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000090 /* ReverseDNSInfoView.swift */; };
+		2000000000000000000000A0 /* AppearanceSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000A0 /* AppearanceSetting.swift */; };
+		2000000000000000000000B0 /* MatterDeviceCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000B0 /* MatterDeviceCounter.swift */; };
+		2000000000000000000000B1 /* CountMatterDevicesIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000B1 /* CountMatterDevicesIntent.swift */; };
+		2000000000000000000000B2 /* HeraldShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000B2 /* HeraldShortcuts.swift */; };
 		88832DDE2F5C894600410D42 /* ServiceEnrichmentSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88832DDD2F5C894600410D42 /* ServiceEnrichmentSection.swift */; };
 		88A849D72F48D7CD0014A1AC /* LiveNetworkNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A849D62F48D7CD0014A1AC /* LiveNetworkNavigationTests.swift */; };
-		200000000000000000000090 /* ReverseDNSInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000090 /* ReverseDNSInfoView.swift */; };
+		2000000000000000000000C0 /* HeraldTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000C0 /* HeraldTips.swift */; };
+		2000000000000000000000C1 /* ThreadBorderRouterCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000C1 /* ThreadBorderRouterCounter.swift */; };
+		2000000000000000000000C2 /* CountThreadBorderRoutersIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000C2 /* CountThreadBorderRoutersIntent.swift */; };
+		2000000000000000000000C3 /* GetNetworkSummaryIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000C3 /* GetNetworkSummaryIntent.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +87,12 @@
 /* Begin PBXFileReference section */
 		100000000000000000000001 /* HeraldApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeraldApp.swift; sourceTree = "<group>"; };
 		100000000000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		1000000000000000000000B3 /* NavigationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationState.swift; sourceTree = "<group>"; };
+		1000000000000000000000B4 /* AppShortcutInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShortcutInfoView.swift; sourceTree = "<group>"; };
+		1000000000000000000000C0 /* HeraldTips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeraldTips.swift; sourceTree = "<group>"; };
+		1000000000000000000000C1 /* ThreadBorderRouterCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadBorderRouterCounter.swift; sourceTree = "<group>"; };
+		1000000000000000000000C2 /* CountThreadBorderRoutersIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountThreadBorderRoutersIntent.swift; sourceTree = "<group>"; };
+		1000000000000000000000C3 /* GetNetworkSummaryIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetNetworkSummaryIntent.swift; sourceTree = "<group>"; };
 		100000000000000000000005 /* ServiceInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceInstance.swift; sourceTree = "<group>"; };
 		100000000000000000000006 /* ResolvedService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResolvedService.swift; sourceTree = "<group>"; };
 		100000000000000000000007 /* ThreadNetworkInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadNetworkInfo.swift; sourceTree = "<group>"; };
@@ -127,6 +143,11 @@
 		100000000000000000000070 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		100000000000000000000080 /* DNSSDServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSSDServiceTests.swift; sourceTree = "<group>"; };
 		100000000000000000000090 /* ReverseDNSInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReverseDNSInfoView.swift; sourceTree = "<group>"; };
+		1000000000000000000000A0 /* AppearanceSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSetting.swift; sourceTree = "<group>"; };
+		1000000000000000000000A1 /* DarkModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkModeTests.swift; sourceTree = "<group>"; };
+		1000000000000000000000B0 /* MatterDeviceCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatterDeviceCounter.swift; sourceTree = "<group>"; };
+		1000000000000000000000B1 /* CountMatterDevicesIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountMatterDevicesIntent.swift; sourceTree = "<group>"; };
+		1000000000000000000000B2 /* HeraldShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeraldShortcuts.swift; sourceTree = "<group>"; };
 		880233C22F41086E003649B8 /* AppStore Screenshots.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "AppStore Screenshots.xctestplan"; sourceTree = "<group>"; };
 		880233C32F41088D003649B8 /* UnitTestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = UnitTestPlan.xctestplan; sourceTree = "<group>"; };
 		88832DDD2F5C894600410D42 /* ServiceEnrichmentSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceEnrichmentSection.swift; sourceTree = "<group>"; };
@@ -177,8 +198,10 @@
 			isa = PBXGroup;
 			children = (
 				300000000000000000000003 /* App */,
+				3000000000000000000000B0 /* AppIntents */,
 				300000000000000000000004 /* Models */,
 				300000000000000000000005 /* Services */,
+				3000000000000000000000C0 /* Tips */,
 				300000000000000000000008 /* ViewModels */,
 				300000000000000000000009 /* Views */,
 				30000000000000000000000E /* Utilities */,
@@ -192,6 +215,7 @@
 			children = (
 				100000000000000000000001 /* HeraldApp.swift */,
 				100000000000000000000002 /* ContentView.swift */,
+				1000000000000000000000B3 /* NavigationState.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -370,8 +394,30 @@
 			children = (
 				100000000000000000000060 /* InfoView.swift */,
 				100000000000000000000061 /* InfoDetailView.swift */,
+				1000000000000000000000B4 /* AppShortcutInfoView.swift */,
 			);
 			path = Info;
+			sourceTree = "<group>";
+		};
+		3000000000000000000000B0 /* AppIntents */ = {
+			isa = PBXGroup;
+			children = (
+				1000000000000000000000B1 /* CountMatterDevicesIntent.swift */,
+				1000000000000000000000C2 /* CountThreadBorderRoutersIntent.swift */,
+				1000000000000000000000C3 /* GetNetworkSummaryIntent.swift */,
+				1000000000000000000000B2 /* HeraldShortcuts.swift */,
+				1000000000000000000000B0 /* MatterDeviceCounter.swift */,
+				1000000000000000000000C1 /* ThreadBorderRouterCounter.swift */,
+			);
+			path = AppIntents;
+			sourceTree = "<group>";
+		};
+		3000000000000000000000C0 /* Tips */ = {
+			isa = PBXGroup;
+			children = (
+				1000000000000000000000C0 /* HeraldTips.swift */,
+			);
+			path = Tips;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -544,6 +590,15 @@
 				200000000000000000000060 /* InfoView.swift in Sources */,
 				200000000000000000000061 /* InfoDetailView.swift in Sources */,
 				200000000000000000000090 /* ReverseDNSInfoView.swift in Sources */,
+				2000000000000000000000B0 /* MatterDeviceCounter.swift in Sources */,
+				2000000000000000000000B1 /* CountMatterDevicesIntent.swift in Sources */,
+				2000000000000000000000B2 /* HeraldShortcuts.swift in Sources */,
+				2000000000000000000000B3 /* NavigationState.swift in Sources */,
+				2000000000000000000000B4 /* AppShortcutInfoView.swift in Sources */,
+				2000000000000000000000C0 /* HeraldTips.swift in Sources */,
+				2000000000000000000000C1 /* ThreadBorderRouterCounter.swift in Sources */,
+				2000000000000000000000C2 /* CountThreadBorderRoutersIntent.swift in Sources */,
+				2000000000000000000000C3 /* GetNetworkSummaryIntent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -724,7 +779,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -752,7 +807,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

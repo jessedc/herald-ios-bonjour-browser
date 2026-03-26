@@ -1,12 +1,18 @@
 import SwiftUI
+import TipKit
 
 struct ThreadNetworkView: View {
     @StateObject private var viewModel = ThreadNetworkViewModel()
     @Environment(\.scenePhase) private var scenePhase
+    private let threadNetworkTip = ThreadNetworkTip()
 
     var body: some View {
         NavigationStack {
             List {
+                TipView(threadNetworkTip)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets())
+
                 DiscoveryStatsSection(
                     chips: [
                         StatChipData(count: viewModel.service.borderRouters.count, label: "Routers", icon: "wifi.router"),
@@ -163,7 +169,7 @@ struct ThreadNetworkView: View {
             .refreshable {
                 viewModel.refresh()
             }
-            .onAppear { viewModel.start() }
+            .task { viewModel.start() }
             .onChange(of: scenePhase) { _, newPhase in
                 switch newPhase {
                 case .active: viewModel.start()

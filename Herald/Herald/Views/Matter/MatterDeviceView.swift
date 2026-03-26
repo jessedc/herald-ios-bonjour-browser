@@ -1,12 +1,23 @@
 import SwiftUI
+import TipKit
 
 struct MatterDeviceView: View {
     @StateObject private var viewModel = MatterDeviceViewModel()
     @Environment(\.scenePhase) private var scenePhase
+    private let matterDeviceTip = MatterDeviceTip()
+    private let matterFabricsTip = MatterFabricsTip()
 
     var body: some View {
         NavigationStack {
             List {
+                TipView(matterDeviceTip)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets())
+
+                TipView(matterFabricsTip)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets())
+
                 DiscoveryStatsSection(
                     chips: statsChips,
                     errors: viewModel.errors
@@ -47,7 +58,13 @@ struct MatterDeviceView: View {
             .refreshable {
                 viewModel.refresh()
             }
-            .onAppear { viewModel.start() }
+            .task {
+                viewModel.start()
+                MatterFabricsTip.fabricCount = viewModel.fabricCount
+            }
+            .onChange(of: viewModel.service.devices.count) { _, _ in
+                MatterFabricsTip.fabricCount = viewModel.fabricCount
+            }
             .onChange(of: scenePhase) { _, newPhase in
                 switch newPhase {
                 case .active: viewModel.start()

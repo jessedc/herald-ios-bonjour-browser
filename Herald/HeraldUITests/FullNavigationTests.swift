@@ -48,6 +48,10 @@ final class FullNavigationTests: XCTestCase {
         )
 
         let matterDeviceRow = app.staticTexts["Test Light"]
+        // Scroll down on smaller screens where tips may push content below the fold
+        if !matterDeviceRow.waitForExistence(timeout: 5) {
+            app.swipeUp()
+        }
         XCTAssertTrue(
             matterDeviceRow.waitForExistence(timeout: 10),
             "A matter device should appear in the Matter tab"

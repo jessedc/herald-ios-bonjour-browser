@@ -285,8 +285,12 @@ final class MockDataTests: XCTestCase {
             app.staticTexts["Test Border Router"].waitForExistence(timeout: 1),
             "Border router should appear"
         )
+        let trelPeer = app.staticTexts["Test TREL Peer"]
+        if !trelPeer.exists {
+            app.swipeUp()
+        }
         XCTAssertTrue(
-            app.staticTexts["Test TREL Peer"].waitForExistence(timeout: 1),
+            trelPeer.waitForExistence(timeout: 1),
             "TREL peer should appear"
         )
 
@@ -330,6 +334,10 @@ final class MockDataTests: XCTestCase {
         XCTAssertTrue(navBar.waitForExistence(timeout: 1))
 
         let deviceRow = app.staticTexts["Test Light"]
+        // Scroll down on smaller screens where tips may push content below the fold
+        if !deviceRow.waitForExistence(timeout: 1) {
+            app.swipeUp()
+        }
         XCTAssertTrue(
             deviceRow.waitForExistence(timeout: 1),
             "Mock matter device should appear"
@@ -341,6 +349,10 @@ final class MockDataTests: XCTestCase {
         let navBar = app.navigationBars["Matter Devices"]
         XCTAssertTrue(navBar.waitForExistence(timeout: 1))
 
+        // Scroll down on smaller screens where tips may push content below the fold
+        if !app.staticTexts["Test Light"].waitForExistence(timeout: 1) {
+            app.swipeUp()
+        }
         XCTAssertTrue(
             app.staticTexts["Test Light"].waitForExistence(timeout: 1),
             "Device name should appear"

@@ -1,7 +1,9 @@
 import SwiftUI
+import TipKit
 
 struct ServiceDetailView: View {
     @StateObject private var viewModel: ServiceDetailViewModel
+    private let reverseDNSTip = ReverseDNSTip()
 
     init(instance: ServiceInstance) {
         _viewModel = StateObject(wrappedValue: ServiceDetailViewModel(instance: instance))
@@ -94,7 +96,9 @@ struct ServiceDetailView: View {
                     }
 
                     if !viewModel.didRunReverseDNS && !viewModel.isLookingUpReverseDNS {
+                        TipView(reverseDNSTip)
                         Button("Run Reverse DNS Lookup") {
+                            reverseDNSTip.invalidate(reason: .actionPerformed)
                             viewModel.runReverseDNS()
                         }
                     }
@@ -137,8 +141,8 @@ struct ServiceDetailView: View {
             ReverseDNSInfoView()
         }
         .exportable(title: viewModel.exportTitle, text: { viewModel.exportText }, json: { viewModel.exportJSON ?? "" })
-        .onAppear {
-            viewModel.resolve()
+        .task {
+            await viewModel.resolveAsync()
         }
     }
 }

@@ -23,6 +23,10 @@ final class ServiceDetailViewModel: ObservableObject, TextExportable {
             .store(in: &cancellables)
     }
 
+    func resolveAsync() async {
+        await resolver.resolveAsync(instance: instance)
+    }
+
     func resolve() {
         resolver.resolve(instance: instance)
     }

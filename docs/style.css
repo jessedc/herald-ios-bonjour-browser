@@ -396,6 +396,11 @@ h1 {
   color: #818cf8;
 }
 
+.feature-icon--siri {
+  background: rgba(251, 146, 60, 0.10);
+  color: #fb923c;
+}
+
 .feature-card h3 {
   font-size: 1.05rem;
   margin-bottom: 8px;

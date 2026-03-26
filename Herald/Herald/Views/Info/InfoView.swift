@@ -1,6 +1,10 @@
 import SwiftUI
+import TipKit
 
 struct InfoView: View {
+    private let siriShortcutTip = SiriShortcutTip()
+    @State private var showTipsResetConfirmation = false
+
     var body: some View {
         NavigationStack {
             List {
@@ -22,14 +26,36 @@ struct InfoView: View {
                         Label("Matter", systemImage: "house")
                     }
                 }
-                
-                Section("App Info") {
-                    HStack {
-                        Text("Version")
-                        Spacer()
-                        Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
-                            .foregroundStyle(.secondary)
+
+                Section("App Shortcuts") {
+                    TipView(siriShortcutTip)
+                    NavigationLink(value: AppShortcutInfoDestination()) {
+                        Label("Count Matter Devices", systemImage: "waveform.and.mic")
                     }
+                    NavigationLink(value: AppShortcutInfoDestination()) {
+                        Label("Count Thread Routers", systemImage: "wifi.router")
+                    }
+                    NavigationLink(value: AppShortcutInfoDestination()) {
+                        Label("Network Summary", systemImage: "network")
+                    }
+                }
+
+                Section("App Settings") {
+                    Button {
+                        showTipsResetConfirmation = true
+                    } label: {
+                        Label("Reset Tips", systemImage: "lightbulb")
+                    }
+                    .confirmationDialog("Reset all tips?", isPresented: $showTipsResetConfirmation) {
+                        Button("Reset Tips") {
+                            try? Tips.resetDatastore()
+                        }
+                    } message: {
+                        Text("All educational tips will appear again.")
+                    }
+                }
+                
+                Section("More Info") {
                     Link(destination: URL(string: "https://heraldapp.app")!) {
                         Label("Website", systemImage: "globe")
                     }
@@ -37,10 +63,21 @@ struct InfoView: View {
                         Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                     }
                 }
+
+                Section {
+                    Text("Herald v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")")
+                        .font(.footnote)
+                        .foregroundStyle(.tertiary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .listRowBackground(Color.clear)
+                }
             }
             .navigationTitle("Info")
             .navigationDestination(for: InfoTab.self) { tab in
                 InfoDetailView(tab: tab)
+            }
+            .navigationDestination(for: AppShortcutInfoDestination.self) { _ in
+                AppShortcutInfoView()
             }
         }
     }
@@ -51,3 +88,5 @@ enum InfoTab: Hashable {
     case thread
     case matter
 }
+
+struct AppShortcutInfoDestination: Hashable {}

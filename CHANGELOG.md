@@ -1,5 +1,23 @@
 # Changelog
 
+## Version 1.2
+
+### Siri & App Shortcuts
+- Ask Siri to count Matter smart home devices on your local network — "How many Matter devices are on my network with Herald"
+- Ask Siri to count Thread border routers — "How many Thread border routers are on my network with Herald"
+- Ask Siri for a full network summary — "What's on my network with Herald"
+
+### Educational Tips
+- Added contextual tips throughout the app to help new users understand Thread networks, Matter fabrics, export functionality, Siri shortcuts, and reverse DNS lookups
+
+### Dark Mode App Icon
+- Added a dark mode variant of the app icon
+
+### Bug Fixes
+- Fixed service detail scroll position resetting after navigating to Reverse DNS lookup info
+- Improved service detail resolution reliability using structured concurrency
+- Improved resolution time for Matter device discovery by removing redundant lookups
+
 ## Version 1.1
 
 ### Matter Tab Enhancements

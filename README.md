@@ -20,6 +20,7 @@ Herald discovers announced service on your network — AirPlay speakers, printer
 - **Thread Network** — Dedicated view for Thread border routers showing network name, vendor, model, and thread version
 - **Matter Devices** — Discover Matter-compatible smart home devices on the network
 - **Export** — Share or export discovered services as a text file (json or plain text)
+- **Siri & Shortcuts** — Ask Siri "How many Matter devices are on my network with Herald" to count Matter devices; tap the result to open the app to the Matter tab
 
 ## Requirements
 
@@ -93,7 +94,8 @@ Service Types (Info.plist) → Instance Browsing → On-Demand Resolution
 Herald/
 ├── Herald.xcodeproj
 └── Herald/
-    ├── App/                    # App entry point, ContentView
+    ├── App/                    # App entry point, ContentView, NavigationState
+    ├── AppIntents/             # Siri intents (CountMatterDevicesIntent, MatterDeviceCounter, HeraldShortcuts)
     ├── Models/                 # ServiceInstance, ResolvedService, ThreadNetworkInfo, etc.
     ├── Services/
     │   ├── Discovery/          # DNSSDService, ServiceInstanceBrowser, ServiceResolver

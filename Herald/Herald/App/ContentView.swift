@@ -11,6 +11,7 @@ struct ContentView: View {
     @StateObject private var discoveryEngine = BonjourDiscoveryEngine()
     @State private var selectedTab: AppTab = .allServices
     @Environment(\.scenePhase) private var scenePhase
+    private var navigationState = NavigationState.shared
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -52,6 +53,9 @@ struct ContentView: View {
             case .active:
                 logger.info("Scene became active — restarting discovery")
                 discoveryEngine.restartAfterBackground()
+                if let tab = navigationState.consumePendingTab() {
+                    selectedTab = tab
+                }
             case .inactive:
                 break
             @unknown default:

@@ -1,7 +1,19 @@
 {
   "images" : [
     {
-      "filename" : "logo-draft-2.png",
+      "filename" : "logo.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "size" : "1024x1024"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "logo-dark.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

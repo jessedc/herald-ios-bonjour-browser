@@ -36,7 +36,19 @@ final class ServiceResolver: ObservableObject, UITestingConfigurable {
     private var resolveTask: Task<Void, Never>?
     private var currentInstance: ServiceInstance?
 
-    func resolve(instance: ServiceInstance) {
+    /// Resolves a service instance. Awaitable — caller owns the Task lifetime.
+    /// Used by `.task` in ServiceDetailView for structured concurrency.
+    func resolveAsync(instance: ServiceInstance) async {
+        // Skip re-resolution if we already have data for this exact instance.
+        // Prevents scroll position loss when .task re-fires due to parent view re-renders.
+        if let current = currentInstance,
+           current.name == instance.name,
+           current.type == instance.type,
+           current.domain == instance.domain,
+           resolved != nil || isResolving {
+            return
+        }
+
         logger.info("resolve: starting for '\(instance.name)' type='\(instance.type)' domain='\(instance.domain)'")
         resolveTask?.cancel()
         reverseDNSTask?.cancel()
@@ -50,50 +62,57 @@ final class ServiceResolver: ObservableObject, UITestingConfigurable {
 
         if applyUITestingOverrides() { return }
 
-        resolveTask = Task {
-            do {
-                logger.info("resolve: step 1 — calling dnssd.resolve()")
-                let (hostname, port, txtRecord) = try await dnssd.resolve(
-                    name: instance.name,
-                    type: instance.type,
-                    domain: instance.domain
-                )
+        do {
+            logger.info("resolve: step 1 — calling dnssd.resolve()")
+            let (hostname, port, txtRecord) = try await dnssd.resolve(
+                name: instance.name,
+                type: instance.type,
+                domain: instance.domain
+            )
 
-                guard !Task.isCancelled else {
-                    logger.info("resolve: cancelled after resolve step")
-                    return
-                }
-
-                logger.info("resolve: step 2 — calling dnssd.getAddresses(hostname: '\(hostname)')")
-                let addresses = try await dnssd.getAddresses(hostname: hostname)
-
-                guard !Task.isCancelled else {
-                    logger.info("resolve: cancelled after getAddresses step")
-                    return
-                }
-
-                // Merge TXT: prefer data from resolve callback, fall back to browse data
-                let mergedTXT = txtRecord.isEmpty ? instance.txtRecord : txtRecord
-                logger.info("resolve: complete — hostname='\(hostname)' port=\(port) ipv4=\(addresses.ipv4) ipv6=\(addresses.ipv6) txtKeys=[\(mergedTXT.keys.joined(separator: ", "))]")
-                resolved = ResolvedService(
-                    name: instance.name,
-                    type: instance.type,
-                    domain: instance.domain,
-                    hostname: hostname,
-                    port: port,
-                    ipv4Addresses: addresses.ipv4.uniqued(),
-                    ipv6Addresses: addresses.ipv6.uniqued(),
-                    txtRecord: mergedTXT,
-                    resolvedAt: Date()
-                )
-            } catch {
-                if !Task.isCancelled {
-                    logger.error("resolve: failed with error: \(error.localizedDescription)")
-                    self.error = error.localizedDescription
-                }
+            guard !Task.isCancelled else {
+                logger.info("resolve: cancelled after resolve step")
+                return
             }
 
-            isResolving = false
+            logger.info("resolve: step 2 — calling dnssd.getAddresses(hostname: '\(hostname)')")
+            let addresses = try await dnssd.getAddresses(hostname: hostname)
+
+            guard !Task.isCancelled else {
+                logger.info("resolve: cancelled after getAddresses step")
+                return
+            }
+
+            // Merge TXT: prefer data from resolve callback, fall back to browse data
+            let mergedTXT = txtRecord.isEmpty ? instance.txtRecord : txtRecord
+            // swiftlint:disable:next line_length
+            logger.info("resolve: complete — hostname='\(hostname)' port=\(port) ipv4=\(addresses.ipv4) ipv6=\(addresses.ipv6) txtKeys=[\(mergedTXT.keys.joined(separator: ", "))]")
+            resolved = ResolvedService(
+                name: instance.name,
+                type: instance.type,
+                domain: instance.domain,
+                hostname: hostname,
+                port: port,
+                ipv4Addresses: addresses.ipv4.uniqued(),
+                ipv6Addresses: addresses.ipv6.uniqued(),
+                txtRecord: mergedTXT,
+                resolvedAt: Date()
+            )
+        } catch {
+            if !Task.isCancelled {
+                logger.error("resolve: failed with error: \(error.localizedDescription)")
+                self.error = error.localizedDescription
+            }
+        }
+
+        isResolving = false
+    }
+
+    /// Fire-and-forget resolve. Used by the error retry button.
+    func resolve(instance: ServiceInstance) {
+        resolveTask?.cancel()
+        resolveTask = Task {
+            await resolveAsync(instance: instance)
         }
     }
 
