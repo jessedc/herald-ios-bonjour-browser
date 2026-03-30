@@ -1,8 +1,8 @@
 # Herald
 
-A network discovery app for iOS that browses Bonjour (mDNS/DNS-SD) services on your local network and displays detailed service information.
+A network discovery app for iOS that browses Bonjour (mDNS/DNS-SD) services on your local network, scans for nearby Bluetooth Low Energy (BLE) devices, and displays detailed service information.
 
-Herald discovers announced service on your network — AirPlay speakers, printers, Thread border routers, Matter devices, and more — and shows their hostname, IP addresses, port, and TXT records.
+Herald discovers announced services on your network — AirPlay speakers, printers, Thread border routers, Matter devices, and more — and shows their hostname, IP addresses, port, and TXT records. It also scans for Matter devices in BLE commissioning mode.
 
 **App Store** [Herald](https://apps.apple.com/us/app/herald-bonjour-dns-sd/id6759459419) | **Website:** [heraldapp.app](https://heraldapp.app)
 
@@ -11,6 +11,7 @@ Herald discovers announced service on your network — AirPlay speakers, printer
   <img src="screenshots/6.9-inch/02_ServiceDetail.png" width="200" alt="Service Detail">
   <img src="screenshots/6.9-inch/03_ThreadNetwork.png" width="200" alt="Thread Network">
   <img src="screenshots/6.9-inch/04_MatterDevices.png" width="200" alt="Matter Devices">
+  <img src="screenshots/6.9-inch/05_Bluetooth.png" width="200" alt="Bluetooth">
 </p>
 
 ## Features
@@ -19,6 +20,7 @@ Herald discovers announced service on your network — AirPlay speakers, printer
 - **Service Detail** — Tap any service to see its hostname, port, IPv4/IPv6 addresses, and TXT record entries
 - **Thread Network** — Dedicated view for Thread border routers showing network name, vendor, model, and thread version
 - **Matter Devices** — Discover Matter-compatible smart home devices on the network
+- **Bluetooth** — Scan for Matter devices in BLE commissioning mode, showing discriminator, vendor ID, and product ID
 - **Export** — Share or export discovered services as a text file (json or plain text)
 - **Siri & Shortcuts** — Ask Siri "How many Matter devices are on my network with Herald" to count Matter devices; tap the result to open the app to the Matter tab
 
@@ -101,12 +103,14 @@ Herald/
     │   ├── Discovery/          # DNSSDService, ServiceInstanceBrowser, ServiceResolver
     │   ├── Thread/             # ThreadNetworkService
     │   ├── Matter/             # MatterDeviceService
+    │   ├── Bluetooth/          # BLEDiscoveryService (CoreBluetooth Matter commissioning scan)
     │   └── BonjourDiscoveryEngine.swift
-    ├── ViewModels/             # ServiceDetailViewModel, ThreadNetworkViewModel, etc.
+    ├── ViewModels/             # ServiceDetailViewModel, ThreadNetworkViewModel, BLEDiscoveryViewModel, etc.
     ├── Views/
     │   ├── AllServices/        # AllServicesView, ServiceDetailView
     │   ├── Thread/             # ThreadNetworkView
     │   ├── Matter/             # MatterDeviceView
+    │   ├── Bluetooth/          # BluetoothView, BLEPeripheralDetailView
     │   ├── Info/               # InfoView
     │   └── Common/             # Shared components (ErrorRow, LabeledRow, ExportToolbarModifier, etc.)
     ├── Utilities/              # ServiceTypeDescriptions, ServiceExporter, TXTRecordLabels, etc.
