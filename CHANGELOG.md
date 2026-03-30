@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 1.3
+
+### Matter Commissioning
+- New Bluetooth tab scans for nearby Matter commissioning devices via BLE (service UUID 0xFFF6)
+
+### Export Enhancements
+- Service detail export enhanced to include service descriptions, decoded Thread/Matter fields, labeled TXT records, and a raw data
+
 ## Version 1.2
 
 ### Siri & App Shortcuts

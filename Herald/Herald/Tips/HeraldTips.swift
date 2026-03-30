@@ -80,6 +80,24 @@ struct SiriShortcutTip: Tip {
     }
 }
 
+// MARK: - Bluetooth Scan Tip
+
+/// Explains what the Bluetooth tab shows — appears on first visit.
+struct BluetoothScanTip: Tip {
+    var title: Text {
+        Text("Bluetooth Scanning")
+    }
+
+    var message: Text? {
+        // swiftlint:disable:next line_length
+        Text("Scans for nearby Bluetooth Low Energy devices. Matter devices in commissioning mode advertise over BLE before joining a network.")
+    }
+
+    var image: Image? {
+        Image(systemName: "antenna.radiowaves.left.and.right")
+    }
+}
+
 // MARK: - Reverse DNS Tip
 
 /// Explains reverse DNS lookups — appears on first detail view visit.

@@ -4,7 +4,7 @@ import os
 private let logger = Logger(subsystem: "com.herald", category: "ContentView")
 
 enum AppTab: Hashable {
-    case allServices, thread, matter, info
+    case allServices, thread, matter, bluetooth, info
 }
 
 struct ContentView: View {
@@ -32,6 +32,12 @@ struct ContentView: View {
                     Label("Matter", systemImage: "house")
                 }
                 .tag(AppTab.matter)
+
+            BluetoothView()
+                .tabItem {
+                    Label("Bluetooth", systemImage: "antenna.radiowaves.left.and.right")
+                }
+                .tag(AppTab.bluetooth)
 
             InfoView()
                 .tabItem {

@@ -7,10 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1CC4895DBC3111EE1FFE4F18 /* BLEDiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F02C2612668D305DF986D4A5 /* BLEDiscoveryService.swift */; };
 		200000000000000000000001 /* HeraldApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000001 /* HeraldApp.swift */; };
 		200000000000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000002 /* ContentView.swift */; };
-		2000000000000000000000B3 /* NavigationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000B3 /* NavigationState.swift */; };
-		2000000000000000000000B4 /* AppShortcutInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000B4 /* AppShortcutInfoView.swift */; };
 		200000000000000000000005 /* ServiceInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000005 /* ServiceInstance.swift */; };
 		200000000000000000000006 /* ResolvedService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000006 /* ResolvedService.swift */; };
 		200000000000000000000007 /* ThreadNetworkInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000007 /* ThreadNetworkInfo.swift */; };
@@ -29,7 +28,6 @@
 		20000000000000000000001A /* ServiceTypeDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000001A /* ServiceTypeDescriptions.swift */; };
 		20000000000000000000001B /* ServiceExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000001B /* ServiceExporter.swift */; };
 		20000000000000000000001F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000001F /* Assets.xcassets */; };
-		200000000000000000000022 /* FullNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000022 /* FullNavigationTests.swift */; };
 		200000000000000000000023 /* AppStoreScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000023 /* AppStoreScreenshotTests.swift */; };
 		200000000000000000000024 /* ErrorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000024 /* ErrorRow.swift */; };
 		200000000000000000000025 /* LabeledRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000025 /* LabeledRow.swift */; };
@@ -55,16 +53,26 @@
 		200000000000000000000062 /* ScreenshotMockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000062 /* ScreenshotMockData.swift */; };
 		200000000000000000000080 /* DNSSDServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000080 /* DNSSDServiceTests.swift */; };
 		200000000000000000000090 /* ReverseDNSInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000090 /* ReverseDNSInfoView.swift */; };
-		2000000000000000000000A0 /* AppearanceSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000A0 /* AppearanceSetting.swift */; };
 		2000000000000000000000B0 /* MatterDeviceCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000B0 /* MatterDeviceCounter.swift */; };
 		2000000000000000000000B1 /* CountMatterDevicesIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000B1 /* CountMatterDevicesIntent.swift */; };
 		2000000000000000000000B2 /* HeraldShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000B2 /* HeraldShortcuts.swift */; };
-		88832DDE2F5C894600410D42 /* ServiceEnrichmentSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88832DDD2F5C894600410D42 /* ServiceEnrichmentSection.swift */; };
-		88A849D72F48D7CD0014A1AC /* LiveNetworkNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A849D62F48D7CD0014A1AC /* LiveNetworkNavigationTests.swift */; };
+		2000000000000000000000B3 /* NavigationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000B3 /* NavigationState.swift */; };
+		2000000000000000000000B4 /* AppShortcutInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000B4 /* AppShortcutInfoView.swift */; };
 		2000000000000000000000C0 /* HeraldTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000C0 /* HeraldTips.swift */; };
 		2000000000000000000000C1 /* ThreadBorderRouterCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000C1 /* ThreadBorderRouterCounter.swift */; };
 		2000000000000000000000C2 /* CountThreadBorderRoutersIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000C2 /* CountThreadBorderRoutersIntent.swift */; };
 		2000000000000000000000C3 /* GetNetworkSummaryIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000C3 /* GetNetworkSummaryIntent.swift */; };
+		2000000000000000000000C4 /* ServiceExportEnrichment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000C4 /* ServiceExportEnrichment.swift */; };
+		45AA909C2E68AEFCDA9E22FF /* MatterDeviceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 679A3A22D493DBC7DC66E1A8 /* MatterDeviceTests.swift */; };
+		5D3FA2775D8209E665258A99 /* ThreadBorderRouterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0745DBF05ED0C4AEC12F2ED3 /* ThreadBorderRouterTests.swift */; };
+		88832DDE2F5C894600410D42 /* ServiceEnrichmentSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88832DDD2F5C894600410D42 /* ServiceEnrichmentSection.swift */; };
+		88A849D72F48D7CD0014A1AC /* LiveNetworkNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A849D62F48D7CD0014A1AC /* LiveNetworkNavigationTests.swift */; };
+		9B5C38CC7FE4B3E1967DBFC5 /* BLEDiscoveryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 682F1E5AFBE50F9EB9E0A607 /* BLEDiscoveryViewModel.swift */; };
+		A164A7DD46F549464A1D6E87 /* BLEPeripheralDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A512F0ED6D5171F1DCC0F1BE /* BLEPeripheralDetailView.swift */; };
+		B5E95F523D8AF3D2BC0F80BD /* BLEPeripheralInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4252056F3A247EA73614332C /* BLEPeripheralInfo.swift */; };
+		CC91923AE752C2A3D7FD1E5B /* BluetoothView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96CA0FF60D5EC6A1FFEAFD64 /* BluetoothView.swift */; };
+		D0472EEA1D9029AD207C84D2 /* BLEPeripheralTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 681A1D23C1FAC85E4A9BBCFD /* BLEPeripheralTests.swift */; };
+		EB8D578F3C1F5318D47B2C03 /* NavigationStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3F2899185420F5C5A3DE7D2 /* NavigationStateTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,14 +93,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0745DBF05ED0C4AEC12F2ED3 /* ThreadBorderRouterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ThreadBorderRouterTests.swift; sourceTree = "<group>"; };
 		100000000000000000000001 /* HeraldApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeraldApp.swift; sourceTree = "<group>"; };
 		100000000000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		1000000000000000000000B3 /* NavigationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationState.swift; sourceTree = "<group>"; };
-		1000000000000000000000B4 /* AppShortcutInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShortcutInfoView.swift; sourceTree = "<group>"; };
-		1000000000000000000000C0 /* HeraldTips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeraldTips.swift; sourceTree = "<group>"; };
-		1000000000000000000000C1 /* ThreadBorderRouterCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadBorderRouterCounter.swift; sourceTree = "<group>"; };
-		1000000000000000000000C2 /* CountThreadBorderRoutersIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountThreadBorderRoutersIntent.swift; sourceTree = "<group>"; };
-		1000000000000000000000C3 /* GetNetworkSummaryIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetNetworkSummaryIntent.swift; sourceTree = "<group>"; };
 		100000000000000000000005 /* ServiceInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceInstance.swift; sourceTree = "<group>"; };
 		100000000000000000000006 /* ResolvedService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResolvedService.swift; sourceTree = "<group>"; };
 		100000000000000000000007 /* ThreadNetworkInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadNetworkInfo.swift; sourceTree = "<group>"; };
@@ -115,7 +118,6 @@
 		10000000000000000000001E /* Herald.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Herald.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		10000000000000000000001F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		100000000000000000000021 /* HeraldUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeraldUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		100000000000000000000022 /* FullNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullNavigationTests.swift; sourceTree = "<group>"; };
 		100000000000000000000023 /* AppStoreScreenshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoreScreenshotTests.swift; sourceTree = "<group>"; };
 		100000000000000000000024 /* ErrorRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorRow.swift; sourceTree = "<group>"; };
 		100000000000000000000025 /* LabeledRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabeledRow.swift; sourceTree = "<group>"; };
@@ -143,16 +145,29 @@
 		100000000000000000000070 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		100000000000000000000080 /* DNSSDServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSSDServiceTests.swift; sourceTree = "<group>"; };
 		100000000000000000000090 /* ReverseDNSInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReverseDNSInfoView.swift; sourceTree = "<group>"; };
-		1000000000000000000000A0 /* AppearanceSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSetting.swift; sourceTree = "<group>"; };
-		1000000000000000000000A1 /* DarkModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkModeTests.swift; sourceTree = "<group>"; };
 		1000000000000000000000B0 /* MatterDeviceCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatterDeviceCounter.swift; sourceTree = "<group>"; };
 		1000000000000000000000B1 /* CountMatterDevicesIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountMatterDevicesIntent.swift; sourceTree = "<group>"; };
 		1000000000000000000000B2 /* HeraldShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeraldShortcuts.swift; sourceTree = "<group>"; };
+		1000000000000000000000B3 /* NavigationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationState.swift; sourceTree = "<group>"; };
+		1000000000000000000000B4 /* AppShortcutInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShortcutInfoView.swift; sourceTree = "<group>"; };
+		1000000000000000000000C0 /* HeraldTips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeraldTips.swift; sourceTree = "<group>"; };
+		1000000000000000000000C1 /* ThreadBorderRouterCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadBorderRouterCounter.swift; sourceTree = "<group>"; };
+		1000000000000000000000C2 /* CountThreadBorderRoutersIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountThreadBorderRoutersIntent.swift; sourceTree = "<group>"; };
+		1000000000000000000000C3 /* GetNetworkSummaryIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetNetworkSummaryIntent.swift; sourceTree = "<group>"; };
+		1000000000000000000000C4 /* ServiceExportEnrichment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceExportEnrichment.swift; sourceTree = "<group>"; };
+		4252056F3A247EA73614332C /* BLEPeripheralInfo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BLEPeripheralInfo.swift; sourceTree = "<group>"; };
+		679A3A22D493DBC7DC66E1A8 /* MatterDeviceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MatterDeviceTests.swift; sourceTree = "<group>"; };
+		681A1D23C1FAC85E4A9BBCFD /* BLEPeripheralTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BLEPeripheralTests.swift; sourceTree = "<group>"; };
+		682F1E5AFBE50F9EB9E0A607 /* BLEDiscoveryViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BLEDiscoveryViewModel.swift; sourceTree = "<group>"; };
 		880233C22F41086E003649B8 /* AppStore Screenshots.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "AppStore Screenshots.xctestplan"; sourceTree = "<group>"; };
 		880233C32F41088D003649B8 /* UnitTestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = UnitTestPlan.xctestplan; sourceTree = "<group>"; };
 		88832DDD2F5C894600410D42 /* ServiceEnrichmentSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceEnrichmentSection.swift; sourceTree = "<group>"; };
 		88867C082F58C5E800677499 /* DNSSDTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = DNSSDTests.xctestplan; sourceTree = "<group>"; };
 		88A849D62F48D7CD0014A1AC /* LiveNetworkNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveNetworkNavigationTests.swift; sourceTree = "<group>"; };
+		96CA0FF60D5EC6A1FFEAFD64 /* BluetoothView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BluetoothView.swift; sourceTree = "<group>"; };
+		A512F0ED6D5171F1DCC0F1BE /* BLEPeripheralDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BLEPeripheralDetailView.swift; sourceTree = "<group>"; };
+		F02C2612668D305DF986D4A5 /* BLEDiscoveryService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BLEDiscoveryService.swift; sourceTree = "<group>"; };
+		F3F2899185420F5C5A3DE7D2 /* NavigationStateTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NavigationStateTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -229,6 +244,7 @@
 				100000000000000000000006 /* ResolvedService.swift */,
 				100000000000000000000007 /* ThreadNetworkInfo.swift */,
 				100000000000000000000041 /* ThreadPeerInfo.swift */,
+				4252056F3A247EA73614332C /* BLEPeripheralInfo.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -243,6 +259,7 @@
 				10000000000000000000002E /* UITestingMode.swift */,
 				10000000000000000000002F /* UITestingConfigurable.swift */,
 				100000000000000000000062 /* ScreenshotMockData.swift */,
+				45542952150E0F4D214E9487 /* Bluetooth */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -271,6 +288,7 @@
 				100000000000000000000043 /* MatterDeviceViewModel.swift */,
 				100000000000000000000010 /* ServiceDetailViewModel.swift */,
 				100000000000000000000011 /* ThreadNetworkViewModel.swift */,
+				682F1E5AFBE50F9EB9E0A607 /* BLEDiscoveryViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -283,6 +301,7 @@
 				30000000000000000000000C /* AllServices */,
 				300000000000000000000060 /* Info */,
 				30000000000000000000000D /* Common */,
+				4FBC156469D19379FB6EFF8B /* Bluetooth */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -325,6 +344,7 @@
 				100000000000000000000019 /* NWTXTRecordParser.swift */,
 				10000000000000000000001A /* ServiceTypeDescriptions.swift */,
 				10000000000000000000001B /* ServiceExporter.swift */,
+				1000000000000000000000C4 /* ServiceExportEnrichment.swift */,
 				10000000000000000000002B /* TextExportable.swift */,
 				100000000000000000000030 /* MatterDeviceTypes.swift */,
 				100000000000000000000031 /* MatterVendorIDs.swift */,
@@ -356,7 +376,6 @@
 		300000000000000000000020 /* HeraldUITests */ = {
 			isa = PBXGroup;
 			children = (
-				100000000000000000000022 /* FullNavigationTests.swift */,
 				88A849D62F48D7CD0014A1AC /* LiveNetworkNavigationTests.swift */,
 				100000000000000000000023 /* AppStoreScreenshotTests.swift */,
 				100000000000000000000052 /* MockDataTests.swift */,
@@ -385,6 +404,10 @@
 			children = (
 				100000000000000000000050 /* ServiceExporterTests.swift */,
 				100000000000000000000080 /* DNSSDServiceTests.swift */,
+				679A3A22D493DBC7DC66E1A8 /* MatterDeviceTests.swift */,
+				681A1D23C1FAC85E4A9BBCFD /* BLEPeripheralTests.swift */,
+				0745DBF05ED0C4AEC12F2ED3 /* ThreadBorderRouterTests.swift */,
+				F3F2899185420F5C5A3DE7D2 /* NavigationStateTests.swift */,
 			);
 			path = HeraldTests;
 			sourceTree = "<group>";
@@ -418,6 +441,25 @@
 				1000000000000000000000C0 /* HeraldTips.swift */,
 			);
 			path = Tips;
+			sourceTree = "<group>";
+		};
+		45542952150E0F4D214E9487 /* Bluetooth */ = {
+			isa = PBXGroup;
+			children = (
+				F02C2612668D305DF986D4A5 /* BLEDiscoveryService.swift */,
+			);
+			name = Bluetooth;
+			path = Bluetooth;
+			sourceTree = "<group>";
+		};
+		4FBC156469D19379FB6EFF8B /* Bluetooth */ = {
+			isa = PBXGroup;
+			children = (
+				96CA0FF60D5EC6A1FFEAFD64 /* BluetoothView.swift */,
+				A512F0ED6D5171F1DCC0F1BE /* BLEPeripheralDetailView.swift */,
+			);
+			name = Bluetooth;
+			path = Bluetooth;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -569,6 +611,7 @@
 				88832DDE2F5C894600410D42 /* ServiceEnrichmentSection.swift in Sources */,
 				20000000000000000000001A /* ServiceTypeDescriptions.swift in Sources */,
 				20000000000000000000001B /* ServiceExporter.swift in Sources */,
+				2000000000000000000000C4 /* ServiceExportEnrichment.swift in Sources */,
 				200000000000000000000024 /* ErrorRow.swift in Sources */,
 				200000000000000000000025 /* LabeledRow.swift in Sources */,
 				200000000000000000000026 /* ExportTextPreview.swift in Sources */,
@@ -599,6 +642,11 @@
 				2000000000000000000000C1 /* ThreadBorderRouterCounter.swift in Sources */,
 				2000000000000000000000C2 /* CountThreadBorderRoutersIntent.swift in Sources */,
 				2000000000000000000000C3 /* GetNetworkSummaryIntent.swift in Sources */,
+				B5E95F523D8AF3D2BC0F80BD /* BLEPeripheralInfo.swift in Sources */,
+				1CC4895DBC3111EE1FFE4F18 /* BLEDiscoveryService.swift in Sources */,
+				9B5C38CC7FE4B3E1967DBFC5 /* BLEDiscoveryViewModel.swift in Sources */,
+				CC91923AE752C2A3D7FD1E5B /* BluetoothView.swift in Sources */,
+				A164A7DD46F549464A1D6E87 /* BLEPeripheralDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -607,7 +655,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				88A849D72F48D7CD0014A1AC /* LiveNetworkNavigationTests.swift in Sources */,
-				200000000000000000000022 /* FullNavigationTests.swift in Sources */,
 				200000000000000000000023 /* AppStoreScreenshotTests.swift in Sources */,
 				200000000000000000000052 /* MockDataTests.swift in Sources */,
 			);
@@ -619,6 +666,10 @@
 			files = (
 				200000000000000000000050 /* ServiceExporterTests.swift in Sources */,
 				200000000000000000000080 /* DNSSDServiceTests.swift in Sources */,
+				45AA909C2E68AEFCDA9E22FF /* MatterDeviceTests.swift in Sources */,
+				D0472EEA1D9029AD207C84D2 /* BLEPeripheralTests.swift in Sources */,
+				5D3FA2775D8209E665258A99 /* ThreadBorderRouterTests.swift in Sources */,
+				EB8D578F3C1F5318D47B2C03 /* NavigationStateTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -779,7 +830,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -807,7 +858,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

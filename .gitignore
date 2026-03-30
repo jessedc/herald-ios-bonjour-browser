@@ -4,3 +4,7 @@ build
 
 # Local Xcode build settings (team ID, bundle identifier)
 Herald/Local.xcconfig
+
+# Bundler
+vendor/bundle
+.bundle

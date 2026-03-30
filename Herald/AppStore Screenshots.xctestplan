@@ -18,8 +18,8 @@
         "AppStoreScreenshotTests\/test02_ServiceDetail()",
         "AppStoreScreenshotTests\/test03_ThreadNetwork()",
         "AppStoreScreenshotTests\/test04_MatterDevices()",
-        "AppStoreScreenshotTests\/test05_TextExport()",
-        "AppStoreScreenshotTests\/testCaptureAppStoreScreenshots()"
+        "AppStoreScreenshotTests\/test05_Bluetooth()",
+        "AppStoreScreenshotTests\/test06_TextExport()"
       ],
       "target" : {
         "containerPath" : "container:Herald.xcodeproj",

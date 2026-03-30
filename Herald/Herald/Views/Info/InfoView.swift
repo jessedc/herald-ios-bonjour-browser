@@ -25,6 +25,9 @@ struct InfoView: View {
                     NavigationLink(value: InfoTab.matter) {
                         Label("Matter", systemImage: "house")
                     }
+                    NavigationLink(value: InfoTab.bluetooth) {
+                        Label("Bluetooth", systemImage: "antenna.radiowaves.left.and.right")
+                    }
                 }
 
                 Section("App Shortcuts") {
@@ -87,6 +90,7 @@ enum InfoTab: Hashable {
     case allServices
     case thread
     case matter
+    case bluetooth
 }
 
 struct AppShortcutInfoDestination: Hashable {}

@@ -19,16 +19,37 @@ final class ServiceExporterTests: XCTestCase {
         )
         let text = ServiceExporter.plainText(for: service)
 
-        XCTAssertTrue(text.contains("Service: My Printer"))
+        // Title banner
+        XCTAssertTrue(text.contains("My Printer"))
+
+        // Service section with description
+        XCTAssertTrue(text.contains("## Service"))
+        XCTAssertTrue(text.contains("Name: My Printer"))
         XCTAssertTrue(text.contains("Type: _ipp._tcp"))
         XCTAssertTrue(text.contains("Domain: local."))
+        XCTAssertTrue(text.contains("Description: "))
+
+        // Connection section
+        XCTAssertTrue(text.contains("## Connection"))
         XCTAssertTrue(text.contains("Hostname: printer.local."))
         XCTAssertTrue(text.contains("Port: 631"))
+
+        // Addresses (one per line in main section)
+        XCTAssertTrue(text.contains("## IPv4 Addresses"))
+        XCTAssertTrue(text.contains("192.168.1.100"))
+        XCTAssertTrue(text.contains("## IPv6 Addresses"))
+        XCTAssertTrue(text.contains("fe80::1"))
+
+        // TXT Record with labels
+        XCTAssertTrue(text.contains("## TXT Record"))
+        XCTAssertTrue(text.contains("Resource Path (rp) = ipp/print"))
+        XCTAssertTrue(text.contains("ty = Laser"))
+
+        // Raw Data section preserves flat format
+        XCTAssertTrue(text.contains("## Raw Data"))
         XCTAssertTrue(text.contains("IPv4: 192.168.1.100"))
         XCTAssertTrue(text.contains("IPv6: fe80::1"))
-        XCTAssertTrue(text.contains("TXT Record:"))
-        XCTAssertTrue(text.contains("rp = ipp/print"))
-        XCTAssertTrue(text.contains("ty = Laser"))
+        XCTAssertTrue(text.contains("  rp = ipp/print"))
     }
 
     func testResolvedServicePlainTextOmitsEmptyAddresses() {
@@ -45,8 +66,8 @@ final class ServiceExporterTests: XCTestCase {
         )
         let text = ServiceExporter.plainText(for: service)
 
-        XCTAssertFalse(text.contains("IPv4"))
-        XCTAssertFalse(text.contains("IPv6"))
+        XCTAssertFalse(text.contains("IPv4 Addresses"))
+        XCTAssertFalse(text.contains("IPv6 Addresses"))
         XCTAssertFalse(text.contains("TXT Record"))
     }
 
@@ -64,6 +85,13 @@ final class ServiceExporterTests: XCTestCase {
         )
         let text = ServiceExporter.plainText(for: service)
 
+        // Main section: one address per line
+        XCTAssertTrue(text.contains("10.0.0.1"))
+        XCTAssertTrue(text.contains("10.0.0.2"))
+        XCTAssertTrue(text.contains("fe80::1"))
+        XCTAssertTrue(text.contains("fe80::2"))
+
+        // Raw Data section: comma-separated
         XCTAssertTrue(text.contains("IPv4: 10.0.0.1, 10.0.0.2"))
         XCTAssertTrue(text.contains("IPv6: fe80::1, fe80::2"))
     }
@@ -88,15 +116,35 @@ final class ServiceExporterTests: XCTestCase {
         let data = json.data(using: .utf8)!
         let parsed = try! JSONSerialization.jsonObject(with: data) as! [String: Any]
 
-        XCTAssertEqual(parsed["name"] as? String, "WebServer")
-        XCTAssertEqual(parsed["type"] as? String, "_http._tcp")
-        XCTAssertEqual(parsed["domain"] as? String, "local.")
-        XCTAssertEqual(parsed["hostname"] as? String, "web.local.")
-        XCTAssertEqual(parsed["port"] as? Int, 8080)
+        // Service section
+        let svc = parsed["service"] as! [String: Any]
+        XCTAssertEqual(svc["name"] as? String, "WebServer")
+        XCTAssertEqual(svc["type"] as? String, "_http._tcp")
+        XCTAssertEqual(svc["domain"] as? String, "local.")
+
+        // Connection section
+        let conn = parsed["connection"] as! [String: Any]
+        XCTAssertEqual(conn["hostname"] as? String, "web.local.")
+        XCTAssertEqual(conn["port"] as? UInt16, 8080)
+
+        // Addresses
         XCTAssertEqual(parsed["ipv4Addresses"] as? [String], ["192.168.1.50"])
         XCTAssertEqual(parsed["ipv6Addresses"] as? [String], [])
-        XCTAssertEqual((parsed["txtRecord"] as? [String: String])?["path"], "/api")
-        XCTAssertNotNil(parsed["resolvedAt"])
+
+        // No enrichment for _http._tcp
+        XCTAssertNil(parsed["enrichment"])
+
+        // TXT Record with label structure
+        let txtRecord = parsed["txtRecord"] as! [String: Any]
+        let pathEntry = txtRecord["path"] as! [String: String]
+        XCTAssertEqual(pathEntry["key"], "path")
+        XCTAssertEqual(pathEntry["value"], "/api")
+
+        // Raw data preserves flat structure
+        let raw = parsed["rawData"] as! [String: Any]
+        XCTAssertEqual(raw["name"] as? String, "WebServer")
+        XCTAssertEqual(raw["hostname"] as? String, "web.local.")
+        XCTAssertNotNil(raw["resolvedAt"])
     }
 
     // MARK: - ResolvedService Reverse DNS
@@ -116,7 +164,7 @@ final class ServiceExporterTests: XCTestCase {
         )
         let text = ServiceExporter.plainText(for: service)
 
-        XCTAssertTrue(text.contains("Reverse DNS:"))
+        XCTAssertTrue(text.contains("## Reverse DNS"))
         XCTAssertTrue(text.contains("192.168.1.50 → myhost.example.com."))
     }
 
@@ -155,8 +203,14 @@ final class ServiceExporterTests: XCTestCase {
         let data = json.data(using: .utf8)!
         let parsed = try! JSONSerialization.jsonObject(with: data) as! [String: Any]
 
+        // Top-level reverse DNS
         let rdns = parsed["reverseDNS"] as? [String: String]
         XCTAssertEqual(rdns?["10.0.0.1"], "server.local.")
+
+        // Also in rawData
+        let raw = parsed["rawData"] as! [String: Any]
+        let rawRdns = raw["reverseDNS"] as? [String: String]
+        XCTAssertEqual(rawRdns?["10.0.0.1"], "server.local.")
     }
 
     func testResolvedServiceJSONOmitsEmptyReverseDNS() {
@@ -177,6 +231,382 @@ final class ServiceExporterTests: XCTestCase {
         let parsed = try! JSONSerialization.jsonObject(with: data) as! [String: Any]
 
         XCTAssertNil(parsed["reverseDNS"])
+    }
+
+    // MARK: - Enrichment: Thread Border Router
+
+    func testResolvedServicePlainTextThreadEnrichment() {
+        let service = ResolvedService(
+            name: "HomePod mini",
+            type: "_meshcop._udp",
+            domain: "local.",
+            hostname: "homepod.local.",
+            port: 49152,
+            ipv4Addresses: ["192.168.1.10"],
+            ipv6Addresses: [],
+            txtRecord: [
+                "nn": "MyThread", "vn": "Apple", "mn": "HomePod mini",
+                "tv": "1.3.0", "xp": "dead00beef00cafe", "pi": "face",
+                "dn": "DefaultDomain", "bb": "1"
+            ],
+            resolvedAt: Date()
+        )
+        let text = ServiceExporter.plainText(for: service)
+
+        XCTAssertTrue(text.contains("## Thread Border Router"))
+        XCTAssertTrue(text.contains("Network Name: MyThread"))
+        XCTAssertTrue(text.contains("Vendor: Apple"))
+        XCTAssertTrue(text.contains("Model: HomePod mini"))
+        XCTAssertTrue(text.contains("Thread Version: 1.3.0"))
+        XCTAssertTrue(text.contains("Extended PAN ID: dead00beef00cafe"))
+        XCTAssertTrue(text.contains("PAN ID: face"))
+        XCTAssertTrue(text.contains("Domain Name: DefaultDomain"))
+        XCTAssertTrue(text.contains("Backbone Router: Yes"))
+    }
+
+    func testResolvedServiceJSONThreadEnrichment() {
+        let service = ResolvedService(
+            name: "HomePod",
+            type: "_meshcop._udp",
+            domain: "local.",
+            hostname: "homepod.local.",
+            port: 49152,
+            ipv4Addresses: [],
+            ipv6Addresses: [],
+            txtRecord: ["nn": "MyThread", "vn": "Apple", "tv": "1.3.0"],
+            resolvedAt: Date()
+        )
+        let json = ServiceExporter.json(for: service)
+        let data = json.data(using: .utf8)!
+        let parsed = try! JSONSerialization.jsonObject(with: data) as! [String: Any]
+
+        let enrichment = parsed["enrichment"] as! [String: Any]
+        XCTAssertEqual(enrichment["type"] as? String, "threadBorderRouter")
+        XCTAssertEqual(enrichment["networkName"] as? String, "MyThread")
+        XCTAssertEqual(enrichment["vendor"] as? String, "Apple")
+        XCTAssertEqual(enrichment["threadVersion"] as? String, "1.3.0")
+    }
+
+    // MARK: - Enrichment: Matter Device
+
+    func testResolvedServicePlainTextMatterEnrichment() {
+        let service = ResolvedService(
+            name: "ABCD1234-0000000000005678",
+            type: "_matter._tcp",
+            domain: "local.",
+            hostname: "light.local.",
+            port: 5540,
+            ipv4Addresses: ["192.168.1.50"],
+            ipv6Addresses: [],
+            txtRecord: [
+                "VP": "65521+32769", "DT": "256", "DN": "Kitchen Light",
+                "D": "3840", "CM": "1", "ICD": "1", "T": "1"
+            ],
+            resolvedAt: Date()
+        )
+        let text = ServiceExporter.plainText(for: service)
+
+        XCTAssertTrue(text.contains("## Matter Operational Device"))
+        XCTAssertTrue(text.contains("Fabric ID: ABCD1234"))
+        XCTAssertTrue(text.contains("Node ID: 5678"))
+        XCTAssertTrue(text.contains("Vendor / Product: 65521+32769 (Test Vendor (CSA))"))
+        XCTAssertTrue(text.contains("Device Type: 256 (On/Off Light)"))
+        XCTAssertTrue(text.contains("Device Name: Kitchen Light"))
+        XCTAssertTrue(text.contains("Discriminator: 3840"))
+        XCTAssertTrue(text.contains("Commissioning Mode: Basic"))
+        XCTAssertTrue(text.contains("Intermittent Device (ICD): Yes (Battery / Sleepy)"))
+        XCTAssertTrue(text.contains("TCP Supported: Yes"))
+    }
+
+    func testResolvedServicePlainTextMatterNonOperational() {
+        let service = ResolvedService(
+            name: "NotHex-Name",
+            type: "_matter._udp",
+            domain: "local.",
+            hostname: "device.local.",
+            port: 5540,
+            ipv4Addresses: [],
+            ipv6Addresses: [],
+            txtRecord: ["DN": "My Device"],
+            resolvedAt: Date()
+        )
+        let text = ServiceExporter.plainText(for: service)
+
+        // Non-parseable name → "Matter Device" not "Matter Operational Device"
+        XCTAssertTrue(text.contains("## Matter Device"))
+        XCTAssertFalse(text.contains("Fabric ID:"))
+        XCTAssertTrue(text.contains("Device Name: My Device"))
+    }
+
+    func testResolvedServiceJSONMatterEnrichment() {
+        let service = ResolvedService(
+            name: "ABCD1234-0000000000005678",
+            type: "_matter._tcp",
+            domain: "local.",
+            hostname: "light.local.",
+            port: 5540,
+            ipv4Addresses: [],
+            ipv6Addresses: [],
+            txtRecord: [
+                "VP": "65521+32769", "DT": "256", "DN": "Kitchen Light",
+                "D": "3840", "CM": "1"
+            ],
+            resolvedAt: Date()
+        )
+        let json = ServiceExporter.json(for: service)
+        let data = json.data(using: .utf8)!
+        let parsed = try! JSONSerialization.jsonObject(with: data) as! [String: Any]
+
+        let enrichment = parsed["enrichment"] as! [String: Any]
+        XCTAssertEqual(enrichment["type"] as? String, "matterOperationalDevice")
+        XCTAssertEqual(enrichment["fabricID"] as? String, "ABCD1234")
+        XCTAssertEqual(enrichment["nodeID"] as? String, "5678")
+        XCTAssertEqual(enrichment["vendorProduct"] as? String, "65521+32769")
+        XCTAssertEqual(enrichment["vendorName"] as? String, "Test Vendor (CSA)")
+        XCTAssertEqual(enrichment["deviceType"] as? String, "256")
+        XCTAssertEqual(enrichment["deviceTypeDescription"] as? String, "On/Off Light")
+        XCTAssertEqual(enrichment["deviceName"] as? String, "Kitchen Light")
+        XCTAssertEqual(enrichment["discriminator"] as? String, "3840")
+        XCTAssertEqual(enrichment["commissioningMode"] as? String, "Basic")
+    }
+
+    // MARK: - Enrichment: Matter Commissioner
+
+    func testResolvedServicePlainTextMatterCommissionerEnrichment() {
+        let service = ResolvedService(
+            name: "MyHub",
+            type: "_matterc._udp",
+            domain: "local.",
+            hostname: "hub.local.",
+            port: 5540,
+            ipv4Addresses: [],
+            ipv6Addresses: [],
+            txtRecord: ["DN": "Hub", "VP": "65521+1", "DT": "22"],
+            resolvedAt: Date()
+        )
+        let text = ServiceExporter.plainText(for: service)
+
+        XCTAssertTrue(text.contains("## Matter Commissioner"))
+        XCTAssertTrue(text.contains("Device Name: Hub"))
+        XCTAssertTrue(text.contains("Vendor / Product: 65521+1 (Test Vendor (CSA))"))
+        XCTAssertTrue(text.contains("Device Type: 22 (Root Node)"))
+    }
+
+    func testResolvedServiceJSONMatterCommissionerEnrichment() {
+        let service = ResolvedService(
+            name: "MyHub",
+            type: "_matterc._udp",
+            domain: "local.",
+            hostname: "hub.local.",
+            port: 5540,
+            ipv4Addresses: [],
+            ipv6Addresses: [],
+            txtRecord: ["DN": "Hub", "VP": "65521+1"],
+            resolvedAt: Date()
+        )
+        let json = ServiceExporter.json(for: service)
+        let data = json.data(using: .utf8)!
+        let parsed = try! JSONSerialization.jsonObject(with: data) as! [String: Any]
+
+        let enrichment = parsed["enrichment"] as! [String: Any]
+        XCTAssertEqual(enrichment["type"] as? String, "matterCommissioner")
+        XCTAssertEqual(enrichment["deviceName"] as? String, "Hub")
+        XCTAssertEqual(enrichment["vendorName"] as? String, "Test Vendor (CSA)")
+    }
+
+    // MARK: - No Enrichment for Generic Services
+
+    func testResolvedServicePlainTextNoEnrichmentForGenericType() {
+        let service = ResolvedService(
+            name: "WebServer",
+            type: "_http._tcp",
+            domain: "local.",
+            hostname: "web.local.",
+            port: 80,
+            ipv4Addresses: [],
+            ipv6Addresses: [],
+            txtRecord: [:],
+            resolvedAt: Date()
+        )
+        let text = ServiceExporter.plainText(for: service)
+
+        XCTAssertFalse(text.contains("Thread Border Router"))
+        XCTAssertFalse(text.contains("Matter"))
+    }
+
+    func testResolvedServiceJSONNoEnrichmentForGenericType() {
+        let service = ResolvedService(
+            name: "WebServer",
+            type: "_http._tcp",
+            domain: "local.",
+            hostname: "web.local.",
+            port: 80,
+            ipv4Addresses: [],
+            ipv6Addresses: [],
+            txtRecord: [:],
+            resolvedAt: Date()
+        )
+        let json = ServiceExporter.json(for: service)
+        let data = json.data(using: .utf8)!
+        let parsed = try! JSONSerialization.jsonObject(with: data) as! [String: Any]
+
+        XCTAssertNil(parsed["enrichment"])
+    }
+
+    // MARK: - TXT Record Labels
+
+    func testResolvedServicePlainTextTXTLabels() {
+        let service = ResolvedService(
+            name: "HomePod",
+            type: "_meshcop._udp",
+            domain: "local.",
+            hostname: "homepod.local.",
+            port: 49152,
+            ipv4Addresses: [],
+            ipv6Addresses: [],
+            txtRecord: ["nn": "MyThread", "tv": "1.3.0"],
+            resolvedAt: Date()
+        )
+        let text = ServiceExporter.plainText(for: service)
+
+        // TXT section uses human-readable labels
+        XCTAssertTrue(text.contains("Network Name (nn) = MyThread"))
+        XCTAssertTrue(text.contains("Thread Version (tv) = 1.3.0"))
+
+        // Raw Data section uses raw keys
+        XCTAssertTrue(text.contains("  nn = MyThread"))
+        XCTAssertTrue(text.contains("  tv = 1.3.0"))
+    }
+
+    func testResolvedServicePlainTextTXTEmptyValue() {
+        let service = ResolvedService(
+            name: "Test",
+            type: "_http._tcp",
+            domain: "local.",
+            hostname: "test.local.",
+            port: 80,
+            ipv4Addresses: [],
+            ipv6Addresses: [],
+            txtRecord: ["flag": ""],
+            resolvedAt: Date()
+        )
+        let text = ServiceExporter.plainText(for: service)
+
+        XCTAssertTrue(text.contains("flag = (empty)"))
+    }
+
+    func testResolvedServiceJSONTXTRecordLabels() {
+        let service = ResolvedService(
+            name: "Printer",
+            type: "_ipp._tcp",
+            domain: "local.",
+            hostname: "printer.local.",
+            port: 631,
+            ipv4Addresses: [],
+            ipv6Addresses: [],
+            txtRecord: ["rp": "ipp/print"],
+            resolvedAt: Date()
+        )
+        let json = ServiceExporter.json(for: service)
+        let data = json.data(using: .utf8)!
+        let parsed = try! JSONSerialization.jsonObject(with: data) as! [String: Any]
+
+        let txtRecord = parsed["txtRecord"] as! [String: Any]
+        let rpEntry = txtRecord["rp"] as! [String: String]
+        XCTAssertEqual(rpEntry["key"], "rp")
+        XCTAssertEqual(rpEntry["label"], "Resource Path")
+        XCTAssertEqual(rpEntry["value"], "ipp/print")
+
+        // Raw data preserves flat txtRecord
+        let raw = parsed["rawData"] as! [String: Any]
+        let rawTxt = raw["txtRecord"] as! [String: String]
+        XCTAssertEqual(rawTxt["rp"], "ipp/print")
+    }
+
+    // MARK: - Raw Data Section
+
+    func testResolvedServicePlainTextRawDataSection() {
+        let service = ResolvedService(
+            name: "Test",
+            type: "_http._tcp",
+            domain: "local.",
+            hostname: "test.local.",
+            port: 80,
+            ipv4Addresses: ["10.0.0.1"],
+            ipv6Addresses: [],
+            txtRecord: ["key": "value"],
+            resolvedAt: Date()
+        )
+        let text = ServiceExporter.plainText(for: service)
+
+        XCTAssertTrue(text.contains("## Raw Data"))
+        // Raw section contains the flat format
+        XCTAssertTrue(text.contains("Service: Test"))
+        XCTAssertTrue(text.contains("Resolved:"))
+    }
+
+    func testResolvedServiceJSONRawDataSection() {
+        let service = ResolvedService(
+            name: "Test",
+            type: "_http._tcp",
+            domain: "local.",
+            hostname: "test.local.",
+            port: 80,
+            ipv4Addresses: ["10.0.0.1"],
+            ipv6Addresses: [],
+            txtRecord: [:],
+            resolvedAt: Date()
+        )
+        let json = ServiceExporter.json(for: service)
+        let data = json.data(using: .utf8)!
+        let parsed = try! JSONSerialization.jsonObject(with: data) as! [String: Any]
+
+        let raw = parsed["rawData"] as! [String: Any]
+        XCTAssertEqual(raw["name"] as? String, "Test")
+        XCTAssertEqual(raw["type"] as? String, "_http._tcp")
+        XCTAssertEqual(raw["hostname"] as? String, "test.local.")
+        XCTAssertEqual(raw["port"] as? UInt16, 80)
+        XCTAssertEqual(raw["ipv4Addresses"] as? [String], ["10.0.0.1"])
+        XCTAssertNotNil(raw["resolvedAt"])
+    }
+
+    // MARK: - Service Description
+
+    func testResolvedServicePlainTextIncludesDescription() {
+        let service = ResolvedService(
+            name: "Printer",
+            type: "_ipp._tcp",
+            domain: "local.",
+            hostname: "printer.local.",
+            port: 631,
+            ipv4Addresses: [],
+            ipv6Addresses: [],
+            txtRecord: [:],
+            resolvedAt: Date()
+        )
+        let text = ServiceExporter.plainText(for: service)
+
+        XCTAssertTrue(text.contains("Description:"))
+    }
+
+    func testResolvedServiceJSONIncludesDescription() {
+        let service = ResolvedService(
+            name: "Printer",
+            type: "_ipp._tcp",
+            domain: "local.",
+            hostname: "printer.local.",
+            port: 631,
+            ipv4Addresses: [],
+            ipv6Addresses: [],
+            txtRecord: [:],
+            resolvedAt: Date()
+        )
+        let json = ServiceExporter.json(for: service)
+        let data = json.data(using: .utf8)!
+        let parsed = try! JSONSerialization.jsonObject(with: data) as! [String: Any]
+
+        let svc = parsed["service"] as! [String: Any]
+        XCTAssertNotNil(svc["description"])
     }
 
     // MARK: - ServiceInstance List Plain Text

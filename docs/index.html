@@ -32,6 +32,7 @@
       <div class="nav-links">
         <a href="#features">Features</a>
         <a href="#screenshots">Screenshots</a>
+        <a href="#whats-new">What's New</a>
         <a href="https://apps.apple.com/us/app/herald-bonjour-dns-sd/id6759459419" class="nav-appstore" aria-label="App Store">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
         </a>
@@ -150,9 +151,63 @@
           <span class="screenshot-label">Matter Devices</span>
         </div>
         <div class="screenshot-item reveal reveal-delay-4">
-          <img src="assets/screenshots/05_TextExport.png" alt="Text Export - export service details as plain text or JSON" loading="lazy">
+          <img src="assets/screenshots/05_Bluetooth.png" alt="Bluetooth - Matter commissioning device discovery via BLE" loading="lazy">
+          <span class="screenshot-label">Bluetooth</span>
+        </div>
+        <div class="screenshot-item reveal reveal-delay-5">
+          <img src="assets/screenshots/06_TextExport.png" alt="Text Export - export service details as plain text or JSON" loading="lazy">
           <span class="screenshot-label">Text Export</span>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What's New -->
+  <section class="whats-new" id="whats-new">
+    <div class="container">
+      <h2 class="section-title reveal">What's New</h2>
+      <div class="changelog">
+
+        <div class="changelog-version reveal">
+          <span class="version-badge">1.3</span>
+          <div class="version-content">
+            <h3>Matter Commissioning via Bluetooth</h3>
+            <ul>
+              <li>New Bluetooth tab scans for nearby Matter commissioning devices via BLE (service UUID 0xFFF6)</li>
+              <li>Service detail export enhanced to include service descriptions, decoded Thread/Matter fields, labeled TXT records, and raw data</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="changelog-version reveal reveal-delay-1">
+          <span class="version-badge">1.2</span>
+          <div class="version-content">
+            <h3>Siri & App Shortcuts</h3>
+            <ul>
+              <li>Ask Siri to count Matter devices, Thread border routers, or get a full network summary</li>
+              <li>Contextual educational tips throughout the app for Thread, Matter, export, and more</li>
+              <li>Dark mode app icon</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="changelog-version reveal reveal-delay-2">
+          <span class="version-badge">1.1</span>
+          <div class="version-content">
+            <h3>Matter Fabrics & Reverse DNS</h3>
+            <ul>
+              <li>Matter devices grouped by fabric with decoded metadata (fabric/node IDs, ICD status, TCP support)</li>
+              <li>On-demand reverse DNS (PTR) lookups for resolved IP addresses</li>
+              <li>New TXT record labels for AirPlay, SRP replication, and Thread border routers</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+      <div class="changelog-link reveal">
+        <a href="https://github.com/jessedc/herald-ios-bonjour-browser/blob/main/CHANGELOG.md" class="btn btn-ghost">
+          View full changelog on GitHub
+        </a>
       </div>
     </div>
   </section>
@@ -176,7 +231,7 @@
   <section class="open-source">
     <div class="container reveal">
       <h2 class="section-title">Open Source</h2>
-      <p class="open-source-desc">Herald is free and open source under the MIT License. No account required, no data collection — everything runs locally on your device.</p>
+      <p class="open-source-desc">Herald is free and open source under the MIT License.</p>
       <div class="cta-row cta-row-center">
         <a href="https://apps.apple.com/us/app/herald-bonjour-dns-sd/id6759459419" class="btn btn-primary">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px;vertical-align:-3px"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>

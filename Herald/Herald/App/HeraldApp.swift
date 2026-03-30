@@ -7,7 +7,12 @@ struct HeraldApp: App {
         WindowGroup {
             ContentView()
                 .task {
-                    try? Tips.configure()
+                    if UITestingMode.current.isActive {
+                        try? Tips.configure()
+                        Tips.hideAllTipsForTesting()
+                    } else {
+                        try? Tips.configure()
+                    }
                 }
         }
     }

@@ -124,13 +124,12 @@ Herald/
 ./scripts/capture_screenshots.sh
 ```
 
-Captures screenshots on three simulators with a clean status bar (9:41, full battery, no carrier). Output is organized into `screenshots/6.7-inch/`, `screenshots/6.9-inch/`, and `screenshots/iPad-13-inch/`.
+Captures screenshots on two simulators with a clean status bar (9:41, full battery, no carrier). Output is organized into `screenshots/6.9-inch/` and `screenshots/iPad-13-inch/`.
 
 | Simulator              | Pixels       | App Store Connect section |
 |------------------------|--------------|---------------------------|
-| iPhone 14 Plus         | 1284 × 2778  | 6.7" Display              |
-| iPhone 16 Pro Max      | 1320 × 2868  | 6.9" Display              |
-| iPad Pro 13-inch (M4)  | 2064 × 2752  | iPad 13" Display          |
+| iPhone 17 Pro Max      | 1320 × 2868  | 6.9" Display              |
+| iPad Pro 13-inch (M5)  | 2064 × 2752  | iPad 13" Display          |
 
 ## License
 

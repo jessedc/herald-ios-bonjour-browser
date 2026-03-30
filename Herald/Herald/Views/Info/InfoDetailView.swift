@@ -14,7 +14,7 @@ struct InfoDetailView: View {
                         }
                     }
                 }
-            case .thread, .matter:
+            case .thread, .matter, .bluetooth:
                 ForEach(queries, id: \.type) { query in
                     Section(query.label ?? "") {
                         queryRow(type: query.type, description: query.description)
@@ -42,6 +42,7 @@ struct InfoDetailView: View {
         case .allServices: "All Services Queries"
         case .thread: "Thread Queries"
         case .matter: "Matter Queries"
+        case .bluetooth: "Bluetooth Queries"
         }
     }
 
@@ -117,6 +118,17 @@ struct InfoDetailView: View {
                         + "Instance names follow the format {fabric-id}-{node-id} (hex), which Herald "
                         + "parses to group devices by fabric. TXT records include session parameters "
                         + "(SII, SAI, T, ICD) but not commissioning fields like D, VP, or DN."
+                ),
+            ]
+        case .bluetooth:
+            return [
+                QueryInfo(
+                    label: "Matter Commissioning (BLE)",
+                    type: "Service UUID: 0xFFF6",
+                    description: "Scans for nearby Bluetooth Low Energy devices advertising the Matter "
+                        + "commissioning service (UUID 0xFFF6, per Matter Core Spec §5.4.2). "
+                        + "Only devices in commissioning mode are visible. Service data is parsed "
+                        + "to extract discriminator, vendor ID, and product ID. "
                 ),
             ]
         }

@@ -4,6 +4,8 @@
 <dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Herald needs Bluetooth access to discover nearby BLE devices, including Matter and Thread devices in commissioning mode.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Herald needs access to your local network to discover Bonjour services, including their names, types, addresses, and metadata.</string>
 	<key>NSBonjourServices</key>

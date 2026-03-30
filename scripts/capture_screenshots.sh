@@ -4,10 +4,9 @@ set -euo pipefail
 # Capture App Store screenshots by running the "AppStore Screenshots" test plan
 # and extracting the resulting screenshot attachments.
 #
-# Produces three sets of screenshots matching App Store Connect size requirements:
-#   - 6.7"  (1284 × 2778): iPhone 14 Plus
-#   - 6.9"  (1320 × 2868): iPhone 16 Pro Max
-#   - iPad 13" (2064 × 2752): iPad Pro 13-inch (M4)
+# Produces two sets of screenshots matching App Store Connect size requirements:
+#   - 6.9"  (1320 × 2868): iPhone 17 Pro Max
+#   - iPad 13" (2064 × 2752): iPad Pro 13-inch (M5)
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
@@ -16,21 +15,18 @@ SCHEME="Herald"
 TEST_PLAN="AppStore Screenshots"
 OUTPUT_DIR="$REPO_ROOT/screenshots"
 
-SIMULATORS="iPhone 14 Plus|6.7-inch|com.apple.CoreSimulator.SimDeviceType.iPhone-14-Plus
-iPhone 16 Pro Max|6.9-inch|com.apple.CoreSimulator.SimDeviceType.iPhone-16-Pro-Max
-iPad Pro 13-inch (M4)|iPad-13-inch|com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M4-8GB"
-
-RUNTIME="com.apple.CoreSimulator.SimRuntime.iOS-26-2"
+SIMULATORS="iPhone 17 Pro Max|6.9-inch|com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max
+iPad Pro 13-inch (M5)|iPad-13-inch|com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB"
 
 echo "==> Cleaning previous results..."
 rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
-# Ensure each simulator exists, creating if needed
+# Ensure each simulator exists, creating if needed (omit runtime to use latest)
 echo "$SIMULATORS" | while IFS='|' read -r SIMULATOR SIZE_DIR DEVICE_TYPE; do
-    if ! xcrun simctl list devices | grep -q "$SIMULATOR"; then
+    if ! xcrun simctl list devices available | grep -q "$SIMULATOR"; then
         echo "==> Creating simulator: $SIMULATOR"
-        xcrun simctl create "$SIMULATOR" "$DEVICE_TYPE" "$RUNTIME"
+        xcrun simctl create "$SIMULATOR" "$DEVICE_TYPE"
     fi
 done
 
@@ -135,7 +131,7 @@ echo ""
 echo "==> Done! Screenshots saved to $OUTPUT_DIR/"
 echo ""
 echo "Contents:"
-for SIZE_DIR in "6.7-inch" "6.9-inch" "iPad-13-inch"; do
+for SIZE_DIR in "6.9-inch" "iPad-13-inch"; do
     echo "  $SIZE_DIR:"
     ls -1 "$OUTPUT_DIR/$SIZE_DIR/" 2>/dev/null | sed 's/^/    /'
 done

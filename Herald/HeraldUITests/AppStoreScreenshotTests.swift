@@ -145,7 +145,32 @@ final class AppStoreScreenshotTests: XCTestCase {
         captureScreenshot(named: "04_MatterDevices")
     }
 
-    func test05_TextExport() throws {
+    func test05_Bluetooth() throws {
+        guard tapTab(named: "Bluetooth") else {
+            XCTFail("Bluetooth tab not found")
+            return
+        }
+
+        let navBar = app.navigationBars["Bluetooth"]
+        guard navBar.waitForExistence(timeout: 5) else {
+            XCTFail("Bluetooth nav bar did not appear")
+            return
+        }
+
+        // Mock data loads on viewModel.start() triggered by onAppear
+        let deviceRow = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", "bluetooth.device.row.")
+        ).firstMatch
+        guard deviceRow.waitForExistence(timeout: 5) else {
+            captureScreenshot(named: "05_Bluetooth_debug")
+            XCTFail("Bluetooth devices did not appear")
+            return
+        }
+
+        captureScreenshot(named: "05_Bluetooth")
+    }
+
+    func test06_TextExport() throws {
         guard tapTab(named: "All Services") else {
             XCTFail("All Services tab not found")
             return
@@ -196,7 +221,7 @@ final class AppStoreScreenshotTests: XCTestCase {
             return
         }
 
-        captureScreenshot(named: "05_TextExport")
+        captureScreenshot(named: "06_TextExport")
     }
 
     // MARK: - Helpers

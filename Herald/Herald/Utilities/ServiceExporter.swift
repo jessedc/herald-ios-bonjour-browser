@@ -6,51 +6,129 @@ enum ServiceExporter {
 
     static func plainText(for service: ResolvedService) -> String {
         var lines: [String] = []
-        lines.append("Service: \(service.name)")
+
+        // Title
+        lines.append("# \(service.name)")
+
+        // Service section
+        lines.append("")
+        lines.append("## Service")
+        lines.append("Name: \(service.name)")
         lines.append("Type: \(service.type)")
         lines.append("Domain: \(service.domain)")
+        if let desc = ServiceTypeDescriptions.description(for: service.type) {
+            lines.append("Description: \(desc)")
+        }
+
+        // Enrichment section (conditional by service type)
+        if let enrichment = ServiceExportEnrichment.plainText(for: service) {
+            lines.append("")
+            lines.append("## \(enrichment.header)")
+            lines.append(contentsOf: enrichment.lines)
+        }
+
+        // Connection section
+        lines.append("")
+        lines.append("## Connection")
         lines.append("Hostname: \(service.hostname)")
-        lines.append("Port: \(service.port)")
+        lines.append("Port: \(service.formattedPort)")
 
+        // IPv4 Addresses
         if !service.ipv4Addresses.isEmpty {
-            lines.append("IPv4: \(service.ipv4Addresses.joined(separator: ", "))")
+            lines.append("")
+            lines.append("## IPv4 Addresses")
+            for addr in service.ipv4Addresses {
+                lines.append(addr)
+            }
         }
+
+        // IPv6 Addresses
         if !service.ipv6Addresses.isEmpty {
-            lines.append("IPv6: \(service.ipv6Addresses.joined(separator: ", "))")
+            lines.append("")
+            lines.append("## IPv6 Addresses")
+            for addr in service.ipv6Addresses {
+                lines.append(addr)
+            }
         }
 
+        // Reverse DNS
         if !service.reverseDNS.isEmpty {
-            lines.append("Reverse DNS:")
+            lines.append("")
+            lines.append("## Reverse DNS")
             for (ip, hostname) in service.reverseDNS.sorted(by: { $0.key < $1.key }) {
-                lines.append("  \(ip) → \(hostname)")
+                lines.append("\(ip) → \(hostname)")
             }
         }
 
+        // TXT Record (with human-readable labels)
         if !service.txtRecord.isEmpty {
-            lines.append("TXT Record:")
+            lines.append("")
+            lines.append("## TXT Record")
             for (key, value) in service.txtRecord.sorted(by: { $0.key < $1.key }) {
-                lines.append("  \(key) = \(value)")
+                let displayKey = TXTRecordLabels.displayKey(for: key, serviceType: service.type)
+                let displayValue = value.isEmpty ? "(empty)" : value
+                lines.append("\(displayKey) = \(displayValue)")
             }
         }
+
+        // Raw Data section
+        lines.append("")
+        lines.append("## Raw Data")
+        lines.append(rawPlainText(for: service))
 
         return lines.joined(separator: "\n")
     }
 
     static func json(for service: ResolvedService) -> String {
-        var dict: [String: Any] = [
+        var dict: [String: Any] = [:]
+
+        // Service section
+        var serviceSection: [String: Any] = [
             "name": service.name,
             "type": service.type,
-            "domain": service.domain,
-            "hostname": service.hostname,
-            "port": service.port,
-            "ipv4Addresses": service.ipv4Addresses,
-            "ipv6Addresses": service.ipv6Addresses,
-            "txtRecord": service.txtRecord,
-            "resolvedAt": ISO8601DateFormatter().string(from: service.resolvedAt)
+            "domain": service.domain
         ]
+        if let desc = ServiceTypeDescriptions.description(for: service.type) {
+            serviceSection["description"] = desc
+        }
+        dict["service"] = serviceSection
+
+        // Enrichment section
+        if let enrichment = ServiceExportEnrichment.json(for: service) {
+            dict["enrichment"] = enrichment
+        }
+
+        // Connection section
+        dict["connection"] = [
+            "hostname": service.hostname,
+            "port": service.port
+        ] as [String: Any]
+
+        // Addresses
+        dict["ipv4Addresses"] = service.ipv4Addresses
+        dict["ipv6Addresses"] = service.ipv6Addresses
+
+        // Reverse DNS
         if !service.reverseDNS.isEmpty {
             dict["reverseDNS"] = service.reverseDNS
         }
+
+        // TXT Record (with labels)
+        if !service.txtRecord.isEmpty {
+            var labeled: [String: Any] = [:]
+            for (key, value) in service.txtRecord {
+                var entry: [String: String] = ["key": key, "value": value]
+                if let label = TXTRecordLabels.label(for: key, serviceType: service.type) {
+                    entry["label"] = label
+                }
+                labeled[key] = entry
+            }
+            dict["txtRecord"] = labeled
+        }
+
+        // Raw data
+        dict["rawData"] = rawJSONDict(for: service)
+
         guard let data = try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .sortedKeys]),
               let str = String(data: data, encoding: .utf8) else {
             return "{}"
@@ -417,6 +495,60 @@ enum ServiceExporter {
         return str
     }
 
+    // MARK: - Single Service Helpers
+
+    private static func rawPlainText(for service: ResolvedService) -> String {
+        var lines: [String] = []
+        lines.append("Service: \(service.name)")
+        lines.append("Type: \(service.type)")
+        lines.append("Domain: \(service.domain)")
+        lines.append("Hostname: \(service.hostname)")
+        lines.append("Port: \(service.port)")
+
+        if !service.ipv4Addresses.isEmpty {
+            lines.append("IPv4: \(service.ipv4Addresses.joined(separator: ", "))")
+        }
+        if !service.ipv6Addresses.isEmpty {
+            lines.append("IPv6: \(service.ipv6Addresses.joined(separator: ", "))")
+        }
+
+        if !service.reverseDNS.isEmpty {
+            lines.append("Reverse DNS:")
+            for (ip, hostname) in service.reverseDNS.sorted(by: { $0.key < $1.key }) {
+                lines.append("  \(ip) → \(hostname)")
+            }
+        }
+
+        if !service.txtRecord.isEmpty {
+            lines.append("TXT Record:")
+            for (key, value) in service.txtRecord.sorted(by: { $0.key < $1.key }) {
+                lines.append("  \(key) = \(value)")
+            }
+        }
+
+        lines.append("Resolved: \(ISO8601DateFormatter().string(from: service.resolvedAt))")
+
+        return lines.joined(separator: "\n")
+    }
+
+    private static func rawJSONDict(for service: ResolvedService) -> [String: Any] {
+        var dict: [String: Any] = [
+            "name": service.name,
+            "type": service.type,
+            "domain": service.domain,
+            "hostname": service.hostname,
+            "port": service.port,
+            "ipv4Addresses": service.ipv4Addresses,
+            "ipv6Addresses": service.ipv6Addresses,
+            "txtRecord": service.txtRecord,
+            "resolvedAt": ISO8601DateFormatter().string(from: service.resolvedAt)
+        ]
+        if !service.reverseDNS.isEmpty {
+            dict["reverseDNS"] = service.reverseDNS
+        }
+        return dict
+    }
+
     // MARK: - Helpers
 
     private static func borderRouterDict(_ router: ThreadBorderRouter) -> [String: Any] {
@@ -469,5 +601,265 @@ enum ServiceExporter {
             return "[]"
         }
         return str
+    }
+}
+
+// MARK: - Bluetooth Export
+
+extension ServiceExporter {
+
+    static func plainText(for peripherals: [BLEPeripheral]) -> String {
+        var lines: [String] = []
+        lines.append("Matter Commissioning Devices — \(ISO8601DateFormatter().string(from: Date()))")
+        lines.append(String(repeating: "─", count: 50))
+
+        if !peripherals.isEmpty {
+            lines.append("")
+            lines.append("Devices (\(peripherals.count))")
+            for peripheral in peripherals {
+                appendPeripheralLines(peripheral, to: &lines)
+            }
+        } else {
+            lines.append("")
+            lines.append("No Matter commissioning devices found.")
+        }
+
+        return lines.joined(separator: "\n")
+    }
+
+    static func json(for peripherals: [BLEPeripheral]) -> String {
+        let items = peripherals.map { peripheral -> [String: Any] in
+            var dict: [String: Any] = [
+                "identifier": peripheral.identifier.uuidString,
+                "rssi": peripheral.rssi,
+                "isConnectable": peripheral.isConnectable,
+                "signalDescription": peripheral.signalDescription
+            ]
+            if let name = peripheral.localName { dict["localName"] = name }
+            if !peripheral.advertisedServiceUUIDs.isEmpty {
+                dict["advertisedServiceUUIDs"] = peripheral.advertisedServiceUUIDs
+            }
+            if let disc = peripheral.matterDiscriminator { dict["matterDiscriminator"] = disc }
+            if let vendor = peripheral.matterVendorID {
+                dict["matterVendorID"] = vendor
+                if let vendorName = peripheral.matterVendorName { dict["matterVendorName"] = vendorName }
+            }
+            if let product = peripheral.matterProductID { dict["matterProductID"] = product }
+            return dict
+        }
+        let dict: [String: Any] = [
+            "timestamp": ISO8601DateFormatter().string(from: Date()),
+            "count": peripherals.count,
+            "peripherals": items
+        ]
+        guard let data = try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .sortedKeys]),
+              let str = String(data: data, encoding: .utf8) else {
+            return "{}"
+        }
+        return str
+    }
+
+    static func plainText(for peripheral: BLEPeripheral) -> String {
+        var lines: [String] = []
+
+        // Title
+        lines.append("# \(peripheral.displayName)")
+
+        // Device section
+        lines.append("")
+        lines.append("## Device")
+        lines.append("Name: \(peripheral.displayName)")
+        lines.append("Identifier: \(peripheral.identifier.uuidString)")
+        lines.append("Connectable: \(peripheral.isConnectable ? "Yes" : "No")")
+
+        // Signal section
+        lines.append("")
+        lines.append("## Signal")
+        lines.append("RSSI: \(peripheral.rssi) dBm")
+        lines.append("Strength: \(peripheral.signalDescription)")
+
+        // Matter Commissioning section (conditional)
+        if peripheral.matterServiceData != nil {
+            lines.append("")
+            lines.append("## Matter Commissioning")
+            if let discriminator = peripheral.matterDiscriminator {
+                lines.append("Discriminator: \(discriminator)")
+            }
+            if let vendorID = peripheral.matterVendorID {
+                if let vendorName = peripheral.matterVendorName {
+                    lines.append("Vendor: \(vendorID) (\(vendorName))")
+                } else {
+                    lines.append("Vendor ID: \(vendorID)")
+                }
+            }
+            if let productID = peripheral.matterProductID {
+                lines.append("Product ID: \(productID)")
+            }
+        }
+
+        // Advertised Services section (conditional)
+        if !peripheral.advertisedServiceUUIDs.isEmpty {
+            lines.append("")
+            lines.append("## Advertised Services")
+            for uuid in peripheral.advertisedServiceUUIDs {
+                lines.append(uuid)
+            }
+        }
+
+        // Manufacturer Data section (conditional)
+        if let manufacturerData = peripheral.manufacturerData, !manufacturerData.isEmpty {
+            lines.append("")
+            lines.append("## Manufacturer Data")
+            lines.append(manufacturerData.map { String(format: "%02X", $0) }.joined(separator: " "))
+        }
+
+        // Timing section
+        lines.append("")
+        lines.append("## Timing")
+        lines.append("First Seen: \(ISO8601DateFormatter().string(from: peripheral.firstSeen))")
+        lines.append("Last Seen: \(ISO8601DateFormatter().string(from: peripheral.lastSeen))")
+
+        // Raw Data section
+        lines.append("")
+        lines.append("## Raw Data")
+        lines.append(rawPlainText(for: peripheral))
+
+        return lines.joined(separator: "\n")
+    }
+
+    static func json(for peripheral: BLEPeripheral) -> String {
+        var dict: [String: Any] = [:]
+
+        // Device section
+        var deviceSection: [String: Any] = [
+            "name": peripheral.displayName,
+            "identifier": peripheral.identifier.uuidString,
+            "isConnectable": peripheral.isConnectable
+        ]
+        if let name = peripheral.localName { deviceSection["localName"] = name }
+        dict["device"] = deviceSection
+
+        // Signal section
+        dict["signal"] = [
+            "rssi": peripheral.rssi,
+            "description": peripheral.signalDescription
+        ] as [String: Any]
+
+        // Matter Commissioning section (conditional)
+        if peripheral.matterServiceData != nil {
+            var matterSection: [String: Any] = [:]
+            if let disc = peripheral.matterDiscriminator { matterSection["discriminator"] = disc }
+            if let vendor = peripheral.matterVendorID {
+                matterSection["vendorID"] = vendor
+                if let vendorName = peripheral.matterVendorName { matterSection["vendorName"] = vendorName }
+            }
+            if let product = peripheral.matterProductID { matterSection["productID"] = product }
+            dict["matterCommissioning"] = matterSection
+        }
+
+        // Advertised Services
+        if !peripheral.advertisedServiceUUIDs.isEmpty {
+            dict["advertisedServices"] = peripheral.advertisedServiceUUIDs
+        }
+
+        // Manufacturer Data (conditional)
+        if let data = peripheral.manufacturerData, !data.isEmpty {
+            dict["manufacturerData"] = data.map { String(format: "%02X", $0) }.joined(separator: " ")
+        }
+
+        // Timing section
+        dict["timing"] = [
+            "firstSeen": ISO8601DateFormatter().string(from: peripheral.firstSeen),
+            "lastSeen": ISO8601DateFormatter().string(from: peripheral.lastSeen)
+        ]
+
+        // Raw data
+        dict["rawData"] = rawJSONDict(for: peripheral)
+
+        guard let data = try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .sortedKeys]),
+              let str = String(data: data, encoding: .utf8) else {
+            return "{}"
+        }
+        return str
+    }
+
+    private static func rawPlainText(for peripheral: BLEPeripheral) -> String {
+        var lines: [String] = []
+        lines.append("Name: \(peripheral.displayName)")
+        lines.append("Identifier: \(peripheral.identifier.uuidString)")
+        lines.append("RSSI: \(peripheral.rssi) dBm (\(peripheral.signalDescription))")
+        lines.append("Connectable: \(peripheral.isConnectable ? "Yes" : "No")")
+        if !peripheral.advertisedServiceUUIDs.isEmpty {
+            lines.append("Services: \(peripheral.advertisedServiceUUIDs.joined(separator: ", "))")
+        }
+        if let data = peripheral.matterServiceData {
+            lines.append("Matter Service Data: \(data.map { String(format: "%02X", $0) }.joined(separator: " "))")
+        }
+        if let data = peripheral.manufacturerData, !data.isEmpty {
+            lines.append("Manufacturer Data: \(data.map { String(format: "%02X", $0) }.joined(separator: " "))")
+        }
+        if let disc = peripheral.matterDiscriminator { lines.append("Discriminator: \(disc)") }
+        if let vendor = peripheral.matterVendorID {
+            if let vendorName = peripheral.matterVendorName {
+                lines.append("Vendor: \(vendor) (\(vendorName))")
+            } else {
+                lines.append("Vendor ID: \(vendor)")
+            }
+        }
+        if let product = peripheral.matterProductID { lines.append("Product ID: \(product)") }
+        lines.append("First Seen: \(ISO8601DateFormatter().string(from: peripheral.firstSeen))")
+        lines.append("Last Seen: \(ISO8601DateFormatter().string(from: peripheral.lastSeen))")
+        return lines.joined(separator: "\n")
+    }
+
+    private static func rawJSONDict(for peripheral: BLEPeripheral) -> [String: Any] {
+        var dict: [String: Any] = [
+            "name": peripheral.displayName,
+            "identifier": peripheral.identifier.uuidString,
+            "rssi": peripheral.rssi,
+            "signalDescription": peripheral.signalDescription,
+            "isConnectable": peripheral.isConnectable,
+            "firstSeen": ISO8601DateFormatter().string(from: peripheral.firstSeen),
+            "lastSeen": ISO8601DateFormatter().string(from: peripheral.lastSeen)
+        ]
+        if let name = peripheral.localName { dict["localName"] = name }
+        if !peripheral.advertisedServiceUUIDs.isEmpty {
+            dict["advertisedServiceUUIDs"] = peripheral.advertisedServiceUUIDs
+        }
+        if let data = peripheral.matterServiceData {
+            dict["matterServiceData"] = data.map { String(format: "%02X", $0) }.joined(separator: " ")
+        }
+        if let data = peripheral.manufacturerData, !data.isEmpty {
+            dict["manufacturerData"] = data.map { String(format: "%02X", $0) }.joined(separator: " ")
+        }
+        if let disc = peripheral.matterDiscriminator { dict["matterDiscriminator"] = disc }
+        if let vendor = peripheral.matterVendorID {
+            dict["matterVendorID"] = vendor
+            if let vendorName = peripheral.matterVendorName { dict["matterVendorName"] = vendorName }
+        }
+        if let product = peripheral.matterProductID { dict["matterProductID"] = product }
+        return dict
+    }
+
+    private static func appendPeripheralLines(_ peripheral: BLEPeripheral, to lines: inout [String]) {
+        lines.append("  • \(peripheral.displayName)")
+        lines.append("      Signal: \(peripheral.rssi) dBm (\(peripheral.signalDescription))")
+        if !peripheral.advertisedServiceUUIDs.isEmpty {
+            lines.append("      Services: \(peripheral.advertisedServiceUUIDs.joined(separator: ", "))")
+        }
+        lines.append("      Connectable: \(peripheral.isConnectable ? "Yes" : "No")")
+        if let disc = peripheral.matterDiscriminator {
+            lines.append("      Discriminator: \(disc)")
+        }
+        if let vendor = peripheral.matterVendorID {
+            if let vendorName = peripheral.matterVendorName {
+                lines.append("      Vendor: \(vendor) (\(vendorName))")
+            } else {
+                lines.append("      Vendor ID: \(vendor)")
+            }
+        }
+        if let product = peripheral.matterProductID {
+            lines.append("      Product ID: \(product)")
+        }
     }
 }

@@ -261,6 +261,36 @@ final class MockDataTests: XCTestCase {
         )
     }
 
+    // MARK: - Bluetooth Tab
+
+    func testBluetoothTabLoadsWithMockData() throws {
+        app.tabBars.buttons["Bluetooth"].tap()
+
+        let navBar = app.navigationBars["Bluetooth"]
+        XCTAssertTrue(navBar.waitForExistence(timeout: 1))
+
+        let deviceRow = app.staticTexts["Test Matter Light"]
+        if !deviceRow.waitForExistence(timeout: 1) {
+            app.swipeUp()
+        }
+        XCTAssertTrue(
+            deviceRow.waitForExistence(timeout: 1),
+            "Mock BLE device should appear"
+        )
+    }
+
+    func testBluetoothExportShowsPreview() throws {
+        app.tabBars.buttons["Bluetooth"].tap()
+        let navBar = app.navigationBars["Bluetooth"]
+        XCTAssertTrue(navBar.waitForExistence(timeout: 1))
+
+        tapExportButton()
+        assertPreviewAppears()
+        dismissPreview()
+
+        XCTAssertTrue(navBar.waitForExistence(timeout: 1), "Should return to Bluetooth after dismissing")
+    }
+
     // MARK: - Thread Tab
 
     func testThreadTabLoadsWithMockData() throws {
@@ -375,6 +405,479 @@ final class MockDataTests: XCTestCase {
         dismissPreview()
 
         XCTAssertTrue(navBar.waitForExistence(timeout: 1), "Should return to Matter after dismissing")
+    }
+
+    // MARK: - Info Tab
+
+    func testInfoTabLoads() throws {
+        app.tabBars.buttons["Info"].tap()
+
+        let navBar = app.navigationBars["Info"]
+        XCTAssertTrue(navBar.waitForExistence(timeout: 2))
+
+        let dnssdText = app.staticTexts.containing(
+            NSPredicate(format: "label CONTAINS %@", "DNS-SD")
+        ).firstMatch
+        XCTAssertTrue(dnssdText.exists, "About section should mention DNS-SD")
+
+        app.swipeUp()
+        let versionText = app.staticTexts.containing(
+            NSPredicate(format: "label CONTAINS %@", "Herald v")
+        ).firstMatch
+        XCTAssertTrue(
+            versionText.waitForExistence(timeout: 1),
+            "Version text should be visible"
+        )
+    }
+
+    func testInfoTabQueriesByTabNavigation() throws {
+        app.tabBars.buttons["Info"].tap()
+        XCTAssertTrue(app.navigationBars["Info"].waitForExistence(timeout: 2))
+
+        // Navigate to All Services Queries
+        app.staticTexts["All Services"].tap()
+        XCTAssertTrue(
+            app.navigationBars["All Services Queries"].waitForExistence(timeout: 2),
+            "All Services Queries detail should appear"
+        )
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.navigationBars["Info"].waitForExistence(timeout: 2))
+
+        // Navigate to Thread Queries
+        app.staticTexts["Thread"].tap()
+        XCTAssertTrue(
+            app.navigationBars["Thread Queries"].waitForExistence(timeout: 2),
+            "Thread Queries detail should appear"
+        )
+        let meshcopText = app.staticTexts.containing(
+            NSPredicate(format: "label CONTAINS %@", "_meshcop._udp")
+        ).firstMatch
+        XCTAssertTrue(meshcopText.exists, "Thread queries should show _meshcop._udp service type")
+    }
+
+    func testInfoTabAppShortcutsNavigation() throws {
+        app.tabBars.buttons["Info"].tap()
+        XCTAssertTrue(app.navigationBars["Info"].waitForExistence(timeout: 2))
+
+        // Scroll to App Shortcuts section and tap
+        let countMatter = app.staticTexts["Count Matter Devices"]
+        if !countMatter.waitForExistence(timeout: 1) {
+            app.swipeUp()
+        }
+        XCTAssertTrue(countMatter.waitForExistence(timeout: 1))
+        countMatter.tap()
+
+        XCTAssertTrue(
+            app.navigationBars["App Shortcuts"].waitForExistence(timeout: 2),
+            "App Shortcuts detail should appear"
+        )
+    }
+
+    func testInfoTabResetTipsConfirmation() throws {
+        app.tabBars.buttons["Info"].tap()
+        XCTAssertTrue(app.navigationBars["Info"].waitForExistence(timeout: 2))
+
+        // Scroll to Reset Tips button
+        let resetButton = app.buttons["Reset Tips"]
+        if !resetButton.waitForExistence(timeout: 1) {
+            app.swipeUp()
+        }
+        XCTAssertTrue(resetButton.waitForExistence(timeout: 1))
+        resetButton.tap()
+
+        // Verify confirmation dialog appears
+        let confirmationText = app.staticTexts["All educational tips will appear again."]
+        XCTAssertTrue(
+            confirmationText.waitForExistence(timeout: 2),
+            "Reset tips confirmation dialog should appear"
+        )
+    }
+
+    // MARK: - Bluetooth Peripheral Detail
+
+    func testBluetoothPeripheralDetailNavigation() throws {
+        app.tabBars.buttons["Bluetooth"].tap()
+        XCTAssertTrue(app.navigationBars["Bluetooth"].waitForExistence(timeout: 2))
+
+        let deviceRow = app.buttons["bluetooth.device.row.A1B2C3D4-E5F6-7890-ABCD-EF1234567890"]
+        if !deviceRow.waitForExistence(timeout: 1) {
+            app.swipeUp()
+        }
+        XCTAssertTrue(deviceRow.waitForExistence(timeout: 1), "BLE device row should exist")
+        deviceRow.tap()
+
+        // Verify detail view loaded with device info
+        let navTitle = app.navigationBars["Test Matter Light"]
+        XCTAssertTrue(navTitle.waitForExistence(timeout: 2), "Detail nav title should show device name")
+
+        let nameLabel = app.staticTexts["Test Matter Light"]
+        XCTAssertTrue(nameLabel.exists, "Device name should appear in detail")
+
+        let rssiLabel = app.staticTexts.containing(
+            NSPredicate(format: "label CONTAINS %@", "dBm")
+        ).firstMatch
+        XCTAssertTrue(rssiLabel.exists, "RSSI value should appear in Signal section")
+
+        // Navigate back
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.navigationBars["Bluetooth"].waitForExistence(timeout: 2))
+    }
+
+    func testBluetoothPeripheralDetailMatterData() throws {
+        app.tabBars.buttons["Bluetooth"].tap()
+        XCTAssertTrue(app.navigationBars["Bluetooth"].waitForExistence(timeout: 2))
+
+        let deviceRow = app.buttons["bluetooth.device.row.A1B2C3D4-E5F6-7890-ABCD-EF1234567890"]
+        if !deviceRow.waitForExistence(timeout: 1) {
+            app.swipeUp()
+        }
+        deviceRow.tap()
+        XCTAssertTrue(app.navigationBars["Test Matter Light"].waitForExistence(timeout: 2))
+
+        // Scroll to Matter Commissioning section
+        app.swipeUp()
+        let discriminatorLabel = app.staticTexts["Discriminator"]
+        XCTAssertTrue(
+            discriminatorLabel.waitForExistence(timeout: 1),
+            "Discriminator label should appear in Matter Commissioning section"
+        )
+    }
+
+    func testBluetoothPeripheralDetailExport() throws {
+        app.tabBars.buttons["Bluetooth"].tap()
+        XCTAssertTrue(app.navigationBars["Bluetooth"].waitForExistence(timeout: 2))
+
+        let deviceRow = app.buttons["bluetooth.device.row.A1B2C3D4-E5F6-7890-ABCD-EF1234567890"]
+        if !deviceRow.waitForExistence(timeout: 1) {
+            app.swipeUp()
+        }
+        deviceRow.tap()
+        XCTAssertTrue(app.navigationBars["Test Matter Light"].waitForExistence(timeout: 2))
+
+        tapExportButton()
+        assertPreviewAppears()
+        dismissPreview()
+    }
+
+    // MARK: - Thread Detail Navigation
+
+    func testThreadBorderRouterDetailNavigation() throws {
+        app.tabBars.buttons["Thread"].tap()
+        XCTAssertTrue(app.navigationBars["Thread Network"].waitForExistence(timeout: 2))
+
+        let routerRow = app.buttons["thread.router.row.Test Border Router"]
+        XCTAssertTrue(routerRow.waitForExistence(timeout: 2), "Border router row should exist")
+        routerRow.tap()
+
+        // Verify detail view loaded — check for the Service section header
+        // which is always present, or the connection section which appears after resolution
+        let serviceSection = app.staticTexts["Service"]
+        let connection = app.otherElements["detail.connection"]
+        let detailReached = serviceSection.waitForExistence(timeout: 5)
+            || connection.waitForExistence(timeout: 5)
+        XCTAssertTrue(detailReached, "Service detail should load for border router")
+
+        // Navigate back
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.navigationBars["Thread Network"].waitForExistence(timeout: 2))
+    }
+
+    func testThreadTRELPeerDetailNavigation() throws {
+        app.tabBars.buttons["Thread"].tap()
+        XCTAssertTrue(app.navigationBars["Thread Network"].waitForExistence(timeout: 2))
+
+        let peerRow = app.buttons["thread.trel.row.Test TREL Peer"]
+        if !peerRow.waitForExistence(timeout: 1) {
+            app.swipeUp()
+        }
+        XCTAssertTrue(peerRow.waitForExistence(timeout: 1), "TREL peer row should exist")
+        peerRow.tap()
+
+        let serviceSection = app.staticTexts["Service"]
+        let connection = app.otherElements["detail.connection"]
+        let detailReached = serviceSection.waitForExistence(timeout: 5)
+            || connection.waitForExistence(timeout: 5)
+        XCTAssertTrue(detailReached, "Service detail should load for TREL peer")
+
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.navigationBars["Thread Network"].waitForExistence(timeout: 2))
+    }
+
+    func testThreadSRPServerDetailNavigation() throws {
+        app.tabBars.buttons["Thread"].tap()
+        XCTAssertTrue(app.navigationBars["Thread Network"].waitForExistence(timeout: 2))
+
+        let srpRow = app.buttons["thread.srp.row.Test SRP Server"]
+        if !srpRow.waitForExistence(timeout: 1) {
+            app.swipeUp()
+        }
+        XCTAssertTrue(srpRow.waitForExistence(timeout: 1), "SRP server row should exist")
+        srpRow.tap()
+
+        let serviceSection = app.staticTexts["Service"]
+        let connection = app.otherElements["detail.connection"]
+        let detailReached = serviceSection.waitForExistence(timeout: 5)
+            || connection.waitForExistence(timeout: 5)
+        XCTAssertTrue(detailReached, "Service detail should load for SRP server")
+
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.navigationBars["Thread Network"].waitForExistence(timeout: 2))
+    }
+
+    func testThreadCommissionerDetailNavigation() throws {
+        app.tabBars.buttons["Thread"].tap()
+        XCTAssertTrue(app.navigationBars["Thread Network"].waitForExistence(timeout: 2))
+
+        let commRow = app.buttons["thread.commissioner.row.Test Commissioner"]
+        if !commRow.waitForExistence(timeout: 1) {
+            app.swipeUp()
+        }
+        XCTAssertTrue(commRow.waitForExistence(timeout: 1), "Commissioner row should exist")
+        commRow.tap()
+
+        let serviceSection = app.staticTexts["Service"]
+        let connection = app.otherElements["detail.connection"]
+        let detailReached = serviceSection.waitForExistence(timeout: 5)
+            || connection.waitForExistence(timeout: 5)
+        XCTAssertTrue(detailReached, "Service detail should load for commissioner")
+
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.navigationBars["Thread Network"].waitForExistence(timeout: 2))
+    }
+
+    // MARK: - Matter Detail Navigation
+
+    func testMatterCommissionableDeviceDetail() throws {
+        app.tabBars.buttons["Matter"].tap()
+        XCTAssertTrue(app.navigationBars["Matter Devices"].waitForExistence(timeout: 2))
+
+        let deviceRow = app.buttons["matter.device.row.Test Matter Device"]
+        if !deviceRow.waitForExistence(timeout: 1) {
+            app.swipeUp()
+        }
+        XCTAssertTrue(deviceRow.waitForExistence(timeout: 1), "Commissionable device row should exist")
+        deviceRow.tap()
+
+        let serviceSection = app.staticTexts["Service"]
+        let connection = app.otherElements["detail.connection"]
+        let detailReached = serviceSection.waitForExistence(timeout: 5)
+            || connection.waitForExistence(timeout: 5)
+        XCTAssertTrue(detailReached, "Service detail should load for commissionable Matter device")
+
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.navigationBars["Matter Devices"].waitForExistence(timeout: 2))
+    }
+
+    func testMatterOperationalDeviceDetail() throws {
+        app.tabBars.buttons["Matter"].tap()
+        XCTAssertTrue(app.navigationBars["Matter Devices"].waitForExistence(timeout: 2))
+
+        let deviceRow = app.buttons["matter.device.row.38271586BF3DEB06-00000000082931E5"]
+        if !deviceRow.waitForExistence(timeout: 1) {
+            app.swipeUp()
+        }
+        XCTAssertTrue(deviceRow.waitForExistence(timeout: 1), "Operational device row should exist")
+        deviceRow.tap()
+
+        let serviceSection = app.staticTexts["Service"]
+        let connection = app.otherElements["detail.connection"]
+        let detailReached = serviceSection.waitForExistence(timeout: 5)
+            || connection.waitForExistence(timeout: 5)
+        XCTAssertTrue(detailReached, "Service detail should load for operational Matter device")
+
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.navigationBars["Matter Devices"].waitForExistence(timeout: 2))
+    }
+
+    // MARK: - Service Detail Content
+
+    func testServiceDetailShowsConnectionInfo() throws {
+        app.tabBars.buttons["All Services"].tap()
+        XCTAssertTrue(app.navigationBars["All Services"].waitForExistence(timeout: 2))
+
+        let row = app.buttons.matching(
+            NSPredicate(format: "identifier == %@", "allServices.row")
+        ).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 2))
+        row.tap()
+
+        let connection = app.staticTexts.matching(
+            NSPredicate(format: "identifier == %@", "detail.connection")
+        ).firstMatch
+        XCTAssertTrue(connection.waitForExistence(timeout: 2), "Connection section should appear")
+
+        let hostname = app.staticTexts["test-host.local."]
+        XCTAssertTrue(hostname.exists, "Hostname should appear in connection section")
+
+        let ip = app.staticTexts["192.168.1.100"]
+        if !ip.exists {
+            app.swipeUp()
+        }
+        XCTAssertTrue(ip.waitForExistence(timeout: 1), "IPv4 address should appear")
+    }
+
+    func testServiceDetailShowsTXTRecord() throws {
+        app.tabBars.buttons["All Services"].tap()
+        XCTAssertTrue(app.navigationBars["All Services"].waitForExistence(timeout: 2))
+
+        let row = app.buttons.matching(
+            NSPredicate(format: "identifier == %@", "allServices.row")
+        ).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 2))
+        row.tap()
+
+        // Wait for detail to load
+        let connection = app.staticTexts.matching(
+            NSPredicate(format: "identifier == %@", "detail.connection")
+        ).firstMatch
+        XCTAssertTrue(connection.waitForExistence(timeout: 2))
+
+        // Scroll to TXT Record section
+        for _ in 0..<3 {
+            app.swipeUp()
+        }
+        let txtSection = app.staticTexts["TXT Record"]
+        XCTAssertTrue(txtSection.waitForExistence(timeout: 1), "TXT Record section should exist")
+    }
+
+    func testServiceDetailExportFormatToggle() throws {
+        app.tabBars.buttons["All Services"].tap()
+        XCTAssertTrue(app.navigationBars["All Services"].waitForExistence(timeout: 2))
+
+        let row = app.buttons.matching(
+            NSPredicate(format: "identifier == %@", "allServices.row")
+        ).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 2))
+        row.tap()
+
+        // Wait for detail to load
+        let connection = app.staticTexts.matching(
+            NSPredicate(format: "identifier == %@", "detail.connection")
+        ).firstMatch
+        XCTAssertTrue(connection.waitForExistence(timeout: 2))
+
+        tapExportButton()
+        assertPreviewAppears()
+
+        // Verify format toggle exists and switch to JSON
+        let jsonSegment = app.buttons["JSON"]
+        XCTAssertTrue(jsonSegment.waitForExistence(timeout: 1), "JSON format option should exist")
+        jsonSegment.tap()
+
+        // Preview should still be visible after switching format
+        let preview = app.otherElements["export.preview"]
+        XCTAssertTrue(preview.exists, "Export preview should remain visible after format toggle")
+
+        dismissPreview()
+    }
+
+    // MARK: - Full Navigation (merged from FullNavigationTests)
+
+    func testFullTabCycleNavigation() throws {
+        // Thread Tab
+        app.tabBars.buttons["Thread"].tap()
+        XCTAssertTrue(
+            app.navigationBars["Thread Network"].waitForExistence(timeout: 2),
+            "Thread Network navigation title should be visible"
+        )
+        XCTAssertTrue(
+            app.staticTexts["Test Border Router"].waitForExistence(timeout: 2),
+            "A border router should appear in the Thread tab"
+        )
+
+        // Bluetooth Tab
+        app.tabBars.buttons["Bluetooth"].tap()
+        XCTAssertTrue(
+            app.navigationBars["Bluetooth"].waitForExistence(timeout: 2),
+            "Bluetooth navigation title should be visible"
+        )
+        let bleDeviceRow = app.staticTexts["Test Matter Light"]
+        if !bleDeviceRow.waitForExistence(timeout: 2) {
+            app.swipeUp()
+        }
+        XCTAssertTrue(bleDeviceRow.waitForExistence(timeout: 2), "A BLE device should appear")
+
+        // Matter Tab
+        app.tabBars.buttons["Matter"].tap()
+        XCTAssertTrue(
+            app.navigationBars["Matter Devices"].waitForExistence(timeout: 2),
+            "Matter Devices navigation title should be visible"
+        )
+        let matterDeviceRow = app.staticTexts["Test Light"]
+        if !matterDeviceRow.waitForExistence(timeout: 2) {
+            app.swipeUp()
+        }
+        XCTAssertTrue(matterDeviceRow.waitForExistence(timeout: 2), "A matter device should appear")
+
+        // All Services Tab
+        app.tabBars.buttons["All Services"].tap()
+        let allServicesNavBar = app.navigationBars["All Services"]
+        XCTAssertTrue(allServicesNavBar.waitForExistence(timeout: 2))
+
+        let allServicesRow = app.buttons.matching(
+            NSPredicate(format: "identifier == %@", "allServices.row")
+        ).firstMatch
+        XCTAssertTrue(allServicesRow.waitForExistence(timeout: 2), "An All Services row should appear")
+
+        // Navigate to detail and back
+        allServicesRow.tap()
+        let detailConnection = app.staticTexts.matching(
+            NSPredicate(format: "identifier == %@", "detail.connection")
+        ).firstMatch
+        let detailResolving = app.staticTexts.matching(
+            NSPredicate(format: "identifier == %@", "detail.resolving")
+        ).firstMatch
+        let detailReached = detailConnection.waitForExistence(timeout: 2)
+            || detailResolving.waitForExistence(timeout: 2)
+        XCTAssertTrue(detailReached, "Should reach detail from All Services")
+
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(allServicesNavBar.waitForExistence(timeout: 2), "Should return to All Services")
+    }
+
+    func testReverseDNSInfoNavigation() throws {
+        app.tabBars.buttons["All Services"].tap()
+
+        let serviceRow = app.buttons.matching(
+            NSPredicate(format: "identifier == %@", "allServices.row")
+        ).firstMatch
+        XCTAssertTrue(serviceRow.waitForExistence(timeout: 2), "A service row should appear")
+        serviceRow.tap()
+
+        // Wait for detail to resolve
+        let connectionSection = app.staticTexts.matching(
+            NSPredicate(format: "identifier == %@", "detail.connection")
+        ).firstMatch
+        let resolvingIndicator = app.staticTexts.matching(
+            NSPredicate(format: "identifier == %@", "detail.resolving")
+        ).firstMatch
+        let detailReached = connectionSection.waitForExistence(timeout: 2)
+            || resolvingIndicator.waitForExistence(timeout: 2)
+        XCTAssertTrue(detailReached, "Service detail should load")
+
+        // Scroll to find Reverse DNS info button
+        let infoButton = app.buttons.matching(
+            NSPredicate(format: "identifier == %@", "detail.reverseDNSInfo")
+        ).firstMatch
+        var found = infoButton.waitForExistence(timeout: 2)
+        for _ in 0..<5 where !found {
+            app.swipeUp()
+            found = infoButton.waitForExistence(timeout: 1)
+        }
+        XCTAssertTrue(found, "Reverse DNS info button should be visible")
+        infoButton.tap()
+
+        let infoNavBar = app.navigationBars["About Reverse DNS Lookups"]
+        XCTAssertTrue(infoNavBar.waitForExistence(timeout: 2), "About Reverse DNS screen should appear")
+
+        let ptrText = app.staticTexts.containing(
+            NSPredicate(format: "label CONTAINS %@", "PTR")
+        ).firstMatch
+        XCTAssertTrue(ptrText.exists, "Info view should contain text about PTR lookups")
+
+        // Navigate back
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(infoButton.waitForExistence(timeout: 2), "Should return to service detail")
     }
 }
 

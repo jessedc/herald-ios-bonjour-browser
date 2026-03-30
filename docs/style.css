@@ -466,6 +466,96 @@ h1 {
   letter-spacing: 0.02em;
 }
 
+/* ── What's New (Changelog) ─────────────────────── */
+.whats-new {
+  padding: 100px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.changelog {
+  max-width: 680px;
+  margin: 52px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.changelog-version {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius);
+  padding: 28px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.changelog-version:hover {
+  border-color: rgba(56, 189, 248, 0.25);
+  box-shadow: 0 8px 32px rgba(56, 189, 248, 0.08);
+}
+
+.version-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 32px;
+  padding: 0 12px;
+  background: var(--cyan-dim);
+  color: var(--cyan);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 100px;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.version-content h3 {
+  font-size: 1rem;
+  color: var(--text);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.version-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.version-content li {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.65;
+  padding-left: 18px;
+  position: relative;
+  margin-bottom: 6px;
+}
+
+.version-content li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(56, 189, 248, 0.3);
+}
+
+.version-content li:last-child {
+  margin-bottom: 0;
+}
+
+.changelog-link {
+  text-align: center;
+  margin-top: 32px;
+}
+
 /* ── Tech ───────────────────────────────────────── */
 .tech {
   padding: 100px 0;
@@ -639,6 +729,7 @@ h1 {
 .reveal-delay-2 { transition-delay: 0.2s; }
 .reveal-delay-3 { transition-delay: 0.3s; }
 .reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
 
 /* ── Responsive ─────────────────────────────────── */
 @media (max-width: 900px) {

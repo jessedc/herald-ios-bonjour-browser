@@ -4,12 +4,11 @@ set -euo pipefail
 # Automate App Store Connect release preparations for Herald.
 #
 # Uses the `asc` CLI (App-Store-Connect-CLI) to:
-#   1. Select a build from Xcode Cloud
-#   2. Create an App Store version (or reuse existing)
-#   3. Upload "What's New" text from CHANGELOG.md
-#   4. Upload screenshots for all device sizes
-#   5. Attach the build to the version
-#   6. Run preflight checks and submit for review
+#   1. Create an App Store version (or reuse existing)
+#   2. Upload "What's New" text from CHANGELOG.md
+#   3. Upload screenshots for all device sizes
+#   4. Select and attach a build to the version
+#   5. Run preflight checks and submit for review
 #
 # Every step is idempotent — safe to re-run if interrupted.
 #
@@ -26,11 +25,13 @@ CHANGELOG="$REPO_ROOT/CHANGELOG.md"
 SCREENSHOTS_DIR="$REPO_ROOT/screenshots"
 
 # Screenshot directory → asc display type mapping.
+# APP_IPHONE_67 and APP_IPHONE_69 share the same screenshot set in App Store
+# Connect and accept identical resolutions (1260×2736, 1290×2796, 1320×2868).
+# Uploading to APP_IPHONE_67 fills both slots.
 # If uploads fail, run `asc screenshots sizes` to find correct identifiers.
 screenshot_types_for() {
   case "$1" in
-    6.7-inch)     echo "APP_IPHONE_65" ;;
-    6.9-inch)     echo "APP_IPHONE_67 APP_IPHONE_69" ;;
+    6.9-inch)     echo "APP_IPHONE_67" ;;
     iPad-13-inch) echo "APP_IPAD_PRO_3GEN_129" ;;
     *)            echo "" ;;
   esac
@@ -123,10 +124,10 @@ ENVIRONMENT VARIABLES:
 WHAT THIS SCRIPT DOES:
 
   Step 1: Reads MARKETING_VERSION from the Xcode project
-  Step 2: Lists recent builds and lets you pick one (or use --build-id)
-  Step 3: Creates an App Store version (or reuses if it already exists)
-  Step 4: Uploads "What's New" text parsed from CHANGELOG.md
-  Step 5: Uploads screenshots from screenshots/ for all device sizes
+  Step 2: Creates an App Store version (or reuses if it already exists)
+  Step 3: Uploads "What's New" text parsed from CHANGELOG.md
+  Step 4: Uploads screenshots from screenshots/ for all device sizes
+  Step 5: Lists recent builds and lets you pick one (or use --build-id)
   Step 6: Attaches the selected build to the version
   Step 7: Runs a preflight check for submission readiness
   Step 8: Submits for App Store review (with interactive confirmation)
@@ -495,6 +496,35 @@ upload_whats_new() {
 # Screenshots
 # ---------------------------------------------------------------------------
 
+delete_existing_screenshots() {
+  echo "==> Deleting existing screenshots..."
+
+  if $DRY_RUN; then
+    echo "  [DRY RUN] Would delete all existing screenshots."
+    return
+  fi
+
+  local list_json
+  run_asc list_json "Failed to list existing screenshots." \
+    asc screenshots list --version-localization "$LOCALIZATION_ID" --output json
+
+  local screenshot_ids
+  screenshot_ids=$(echo "$list_json" | jq -r '.sets[].screenshots[]?.id // empty')
+
+  if [[ -z "$screenshot_ids" ]]; then
+    echo "  No existing screenshots to delete."
+    return
+  fi
+
+  local count=0
+  while IFS= read -r sid; do
+    asc screenshots delete --id "$sid" --confirm --output json >/dev/null 2>&1
+    count=$((count + 1))
+  done <<< "$screenshot_ids"
+
+  echo -e "  ${GREEN}Deleted $count existing screenshots.${RESET}"
+}
+
 upload_screenshots() {
   echo "==> Uploading screenshots..."
 
@@ -504,7 +534,9 @@ upload_screenshots() {
     return
   fi
 
-  for dir_name in "6.7-inch" "6.9-inch" "iPad-13-inch"; do
+  delete_existing_screenshots
+
+  for dir_name in "6.9-inch" "iPad-13-inch"; do
     local src_dir="$SCREENSHOTS_DIR/$dir_name"
 
     if [[ ! -d "$src_dir" ]]; then
@@ -535,7 +567,6 @@ upload_screenshots() {
         --version-localization "$LOCALIZATION_ID" \
         --path "$src_dir" \
         --device-type "$device_type" \
-        --skip-existing \
         --output json >/dev/null 2>&1; then
         echo -e "${RED}  Error uploading $dir_name as $device_type.${RESET}" >&2
         echo "  The display type identifier may be incorrect." >&2
@@ -669,11 +700,11 @@ main() {
   check_prerequisites
   determine_app_id
   read_marketing_version
-  select_build
   create_or_get_version
   get_localization_id
   upload_whats_new
   upload_screenshots
+  select_build
   attach_build
   preflight_check
   submit_for_review

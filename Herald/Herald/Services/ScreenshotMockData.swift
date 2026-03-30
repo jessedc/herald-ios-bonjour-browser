@@ -353,5 +353,31 @@ enum ScreenshotMockData {
             addresses: ["10.0.1.51", "fe80::1a2b:3c4d:5e6f:2002"]
         )
     ]
+    // MARK: - Bluetooth Devices
+
+    static let blePeripherals: [BLEPeripheral] = [
+        BLEPeripheral(
+            identifier: UUID(uuidString: "A1B2C3D4-E5F6-7890-ABCD-EF1234567890")!,
+            localName: "Nanoleaf Strip A087",
+            advertisedServiceUUIDs: ["FFF6"],
+            manufacturerData: nil,
+            matterServiceData: Data([0x00, 0xA0, 0x0B, 0xA0, 0x11, 0x01, 0x00]),
+            rssi: -48,
+            isConnectable: true,
+            firstSeen: Date().addingTimeInterval(-120),
+            lastSeen: Date()
+        ),
+        BLEPeripheral(
+            identifier: UUID(uuidString: "B2C3D4E5-F6A7-8901-BCDE-F12345678901")!,
+            localName: "Eve Room B204",
+            advertisedServiceUUIDs: ["FFF6"],
+            manufacturerData: nil,
+            matterServiceData: Data([0x00, 0x04, 0x06, 0x0A, 0x13, 0x52, 0x00]),
+            rssi: -62,
+            isConnectable: true,
+            firstSeen: Date().addingTimeInterval(-90),
+            lastSeen: Date()
+        )
+    ]
 }
 // swiftlint:enable function_body_length type_body_length
