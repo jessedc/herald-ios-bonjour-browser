@@ -11,7 +11,7 @@ final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
     @Published private(set) var borderRouters: [ThreadBorderRouter] = []
     @Published private(set) var trelPeers: [TRELPeer] = []
     @Published private(set) var srpServers: [SRPServer] = []
-    @Published private(set) var commissioners: [MatterCommissioner] = []
+    @Published private(set) var commissionables: [MatterCommissionable] = []
     @Published private(set) var isSearching = false
     @Published private(set) var errors: [DiscoveryError] = []
 
@@ -85,7 +85,7 @@ final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
                 }
                 if mattercInstances.count != lastMattercCount {
                     lastMattercCount = mattercInstances.count
-                    await resolveAndUpdateCommissioners(from: mattercInstances)
+                    await resolveAndUpdateCommissionables(from: mattercInstances)
                 }
             }
         }
@@ -95,7 +95,7 @@ final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
         borderRouters = []
         trelPeers = []
         srpServers = []
-        commissioners = []
+        commissionables = []
     }
 
     func stopDiscovery() {
@@ -228,9 +228,9 @@ final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
         srpServers = servers.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
-    private func resolveAndUpdateCommissioners(from instances: [ServiceInstance]) async {
+    private func resolveAndUpdateCommissionables(from instances: [ServiceInstance]) async {
         let dnssd = self.dnssd
-        let comms: [MatterCommissioner] = await withTaskGroup(of: MatterCommissioner.self) { group in
+        let comms: [MatterCommissionable] = await withTaskGroup(of: MatterCommissionable.self) { group in
             for instance in instances {
                 let name = instance.name
                 let type = instance.type
@@ -239,7 +239,7 @@ final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
                     do {
                         let resolved = try await dnssd.resolve(name: name, type: type, domain: domain)
                         let txt = resolved.txtRecord
-                        return MatterCommissioner(
+                        return MatterCommissionable(
                             name: name,
                             deviceName: txt["DN"],
                             vendorProductID: txt["VP"],
@@ -249,8 +249,8 @@ final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
                             addresses: []
                         )
                     } catch {
-                        logger.warning("resolveAndUpdateCommissioners: failed to resolve '\(name)': \(error.localizedDescription)")
-                        return MatterCommissioner(
+                        logger.warning("resolveAndUpdateCommissionables: failed to resolve '\(name)': \(error.localizedDescription)")
+                        return MatterCommissionable(
                             name: name,
                             deviceName: nil,
                             vendorProductID: nil,
@@ -262,13 +262,13 @@ final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
                     }
                 }
             }
-            var results: [MatterCommissioner] = []
+            var results: [MatterCommissionable] = []
             for await comm in group {
                 results.append(comm)
             }
             return results
         }
-        commissioners = comms.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        commissionables = comms.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
     // MARK: - UITestingConfigurable
@@ -290,7 +290,7 @@ final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
         borderRouters = ScreenshotMockData.borderRouters
         trelPeers = ScreenshotMockData.trelPeers
         srpServers = ScreenshotMockData.srpServers
-        commissioners = ScreenshotMockData.commissioners
+        commissionables = ScreenshotMockData.commissionables
         isSearching = false
     }
 
@@ -322,14 +322,14 @@ final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
         srpServers = [
             SRPServer(name: "Test SRP Server", hostname: "srp-server.local.", port: 53, addresses: ["192.168.1.3"])
         ]
-        commissioners = [
-            MatterCommissioner(
-                name: "Test Commissioner",
+        commissionables = [
+            MatterCommissionable(
+                name: "Test Commissionable",
                 deviceName: "Kitchen Hub",
                 vendorProductID: "65521+32769",
                 deviceType: "256",
                 commissioningMode: "1",
-                hostname: "commissioner.local.",
+                hostname: "commissionable.local.",
                 addresses: ["192.168.1.4"]
             )
         ]

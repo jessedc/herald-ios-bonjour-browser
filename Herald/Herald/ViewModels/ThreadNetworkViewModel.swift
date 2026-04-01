@@ -41,7 +41,7 @@ final class ThreadNetworkViewModel: ObservableObject, TextExportable {
             borderRouters: service.borderRouters,
             trelPeers: service.trelPeers,
             srpServers: service.srpServers,
-            commissioners: service.commissioners
+            commissionables: service.commissionables
         )
     }
 
@@ -50,7 +50,7 @@ final class ThreadNetworkViewModel: ObservableObject, TextExportable {
             borderRouters: service.borderRouters,
             trelPeers: service.trelPeers,
             srpServers: service.srpServers,
-            commissioners: service.commissioners
+            commissionables: service.commissionables
         )
     }
 

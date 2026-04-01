@@ -25,7 +25,7 @@ struct SRPServer: Identifiable {
     }
 }
 
-struct MatterCommissioner: Identifiable {
+struct MatterCommissionable: Identifiable {
     let name: String
     let deviceName: String?
     let vendorProductID: String?

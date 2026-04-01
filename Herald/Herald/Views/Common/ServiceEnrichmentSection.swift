@@ -10,7 +10,7 @@ struct ServiceEnrichmentSection: View {
         case "_matter._tcp", "_matter._udp", "_matterd._udp":
             matterSection
         case "_matterc._udp":
-            matterCommissionerSection
+            matterCommissionableSection
         default:
             EmptyView()
         }
@@ -99,12 +99,12 @@ struct ServiceEnrichmentSection: View {
         }
     }
 
-    // MARK: - Matter Commissioner
+    // MARK: - Matter Commissionable
 
     @ViewBuilder
-    private var matterCommissionerSection: some View {
+    private var matterCommissionableSection: some View {
         let txt = instance.txtRecord
-        Section("Matter Commissioner") {
+        Section("Matter Commissionable") {
             if let dn = txt["DN"] {
                 LabeledRow(label: "Device Name", value: dn)
             }
