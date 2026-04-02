@@ -254,8 +254,8 @@ enum ScreenshotMockData {
         )
     ]
 
-    static let commissioners: [MatterCommissioner] = [
-        MatterCommissioner(
+    static let commissionables: [MatterCommissionable] = [
+        MatterCommissionable(
             name: "Living Room HomePod mini",
             deviceName: "Living Room",
             vendorProductID: "4937+9",

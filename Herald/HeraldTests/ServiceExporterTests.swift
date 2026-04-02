@@ -370,9 +370,9 @@ final class ServiceExporterTests: XCTestCase {
         XCTAssertEqual(enrichment["commissioningMode"] as? String, "Basic")
     }
 
-    // MARK: - Enrichment: Matter Commissioner
+    // MARK: - Enrichment: Matter Commissionable
 
-    func testResolvedServicePlainTextMatterCommissionerEnrichment() {
+    func testResolvedServicePlainTextMatterCommissionableEnrichment() {
         let service = ResolvedService(
             name: "MyHub",
             type: "_matterc._udp",
@@ -386,13 +386,13 @@ final class ServiceExporterTests: XCTestCase {
         )
         let text = ServiceExporter.plainText(for: service)
 
-        XCTAssertTrue(text.contains("## Matter Commissioner"))
+        XCTAssertTrue(text.contains("## Matter Commissionable"))
         XCTAssertTrue(text.contains("Device Name: Hub"))
         XCTAssertTrue(text.contains("Vendor / Product: 65521+1 (Test Vendor (CSA))"))
         XCTAssertTrue(text.contains("Device Type: 22 (Root Node)"))
     }
 
-    func testResolvedServiceJSONMatterCommissionerEnrichment() {
+    func testResolvedServiceJSONMatterCommissionableEnrichment() {
         let service = ResolvedService(
             name: "MyHub",
             type: "_matterc._udp",
@@ -409,7 +409,7 @@ final class ServiceExporterTests: XCTestCase {
         let parsed = try! JSONSerialization.jsonObject(with: data) as! [String: Any]
 
         let enrichment = parsed["enrichment"] as! [String: Any]
-        XCTAssertEqual(enrichment["type"] as? String, "matterCommissioner")
+        XCTAssertEqual(enrichment["type"] as? String, "matterCommissionable")
         XCTAssertEqual(enrichment["deviceName"] as? String, "Hub")
         XCTAssertEqual(enrichment["vendorName"] as? String, "Test Vendor (CSA)")
     }
@@ -892,8 +892,8 @@ final class ServiceExporterTests: XCTestCase {
         let srpServers = [
             SRPServer(name: "SRP1", hostname: "srp.local.", port: 53, addresses: [])
         ]
-        let commissioners = [
-            MatterCommissioner(
+        let commissionables = [
+            MatterCommissionable(
                 name: "Comm1", deviceName: "Hub", vendorProductID: "1+2",
                 deviceType: nil, commissioningMode: nil, hostname: nil, addresses: []
             )
@@ -903,7 +903,7 @@ final class ServiceExporterTests: XCTestCase {
             borderRouters: routers,
             trelPeers: trelPeers,
             srpServers: srpServers,
-            commissioners: commissioners
+            commissionables: commissionables
         )
 
         XCTAssertTrue(text.contains("Thread Network"))
@@ -915,7 +915,7 @@ final class ServiceExporterTests: XCTestCase {
         XCTAssertTrue(text.contains("• Peer1"))
         XCTAssertTrue(text.contains("Hostname: peer.local."))
 
-        XCTAssertTrue(text.contains("Commissioners (1)"))
+        XCTAssertTrue(text.contains("Commissionable (1)"))
         XCTAssertTrue(text.contains("• Comm1"))
         XCTAssertTrue(text.contains("Device Name: Hub"))
         XCTAssertTrue(text.contains("Vendor/Product: 1+2"))
@@ -939,13 +939,13 @@ final class ServiceExporterTests: XCTestCase {
             ],
             trelPeers: [],
             srpServers: [],
-            commissioners: []
+            commissionables: []
         )
 
         XCTAssertTrue(text.contains("Border Routers (1)"))
         XCTAssertFalse(text.contains("TREL Peers"))
         XCTAssertFalse(text.contains("SRP Servers"))
-        XCTAssertFalse(text.contains("Commissioners"))
+        XCTAssertFalse(text.contains("Commissionable"))
     }
 
     func testThreadNetworkExpandedAllEmpty() {
@@ -953,7 +953,7 @@ final class ServiceExporterTests: XCTestCase {
             borderRouters: [],
             trelPeers: [],
             srpServers: [],
-            commissioners: []
+            commissionables: []
         )
 
         XCTAssertTrue(text.contains("No Thread network devices found."))
@@ -964,7 +964,7 @@ final class ServiceExporterTests: XCTestCase {
             borderRouters: [],
             trelPeers: [],
             srpServers: [SRPServer(name: "S", hostname: nil, port: 0, addresses: [])],
-            commissioners: []
+            commissionables: []
         )
 
         XCTAssertTrue(text.contains("• S"))
@@ -976,7 +976,7 @@ final class ServiceExporterTests: XCTestCase {
             borderRouters: [],
             trelPeers: [TRELPeer(name: "P", hostname: nil, addresses: [])],
             srpServers: [],
-            commissioners: []
+            commissionables: []
         )
 
         XCTAssertTrue(text.contains("• P"))

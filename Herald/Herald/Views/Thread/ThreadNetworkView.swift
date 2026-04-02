@@ -17,7 +17,7 @@ struct ThreadNetworkView: View {
                     chips: [
                         StatChipData(count: viewModel.service.borderRouters.count, label: "Routers", icon: "wifi.router"),
                         StatChipData(count: viewModel.service.trelPeers.count, label: "TREL", icon: "antenna.radiowaves.left.and.right"),
-                        StatChipData(count: viewModel.service.commissioners.count, label: "Commissioners", icon: "dot.radiowaves.right"),
+                        StatChipData(count: viewModel.service.commissionables.count, label: "Commissionable", icon: "dot.radiowaves.right"),
                         StatChipData(count: viewModel.service.srpServers.count, label: "SRP", icon: "server.rack")
                     ],
                     errors: viewModel.errors
@@ -84,10 +84,10 @@ struct ThreadNetworkView: View {
                     }
                 }
 
-                // Matter Commissioners
-                if !viewModel.service.commissioners.isEmpty {
-                    Section("Commissioners (\(viewModel.service.commissioners.count))") {
-                        ForEach(viewModel.service.commissioners) { comm in
+                // Matter Commissionable Devices
+                if !viewModel.service.commissionables.isEmpty {
+                    Section("Commissionable (\(viewModel.service.commissionables.count))") {
+                        ForEach(viewModel.service.commissionables) { comm in
                             NavigationLink(value: comm.serviceInstance) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(comm.name)
@@ -111,7 +111,7 @@ struct ThreadNetworkView: View {
                                 }
                                 .padding(.vertical, 2)
                             }
-                            .accessibilityIdentifier("thread.commissioner.row.\(comm.name)")
+                            .accessibilityIdentifier("thread.commissionable.row.\(comm.name)")
                         }
                     }
                 }
@@ -141,7 +141,7 @@ struct ThreadNetworkView: View {
                     }
                 }
             }
-            .animation(.default, value: viewModel.service.borderRouters.count + viewModel.service.trelPeers.count + viewModel.service.commissioners.count + viewModel.service.srpServers.count)
+            .animation(.default, value: viewModel.service.borderRouters.count + viewModel.service.trelPeers.count + viewModel.service.commissionables.count + viewModel.service.srpServers.count)
             .navigationDestination(for: ServiceInstance.self) { instance in
                 ServiceDetailView(instance: instance)
             }
@@ -150,7 +150,7 @@ struct ThreadNetworkView: View {
                 let allEmpty = viewModel.service.borderRouters.isEmpty
                     && viewModel.service.trelPeers.isEmpty
                     && viewModel.service.srpServers.isEmpty
-                    && viewModel.service.commissioners.isEmpty
+                    && viewModel.service.commissionables.isEmpty
                 if viewModel.service.isSearching && allEmpty {
                     VStack(spacing: 12) {
                         ProgressView()

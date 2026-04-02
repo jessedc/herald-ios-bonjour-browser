@@ -1,7 +1,7 @@
 import Foundation
 
 /// Enrichment formatters for single-service export, mirroring the decoded
-/// fields shown in ServiceEnrichmentSection (Thread, Matter, Commissioner).
+/// fields shown in ServiceEnrichmentSection (Thread, Matter, Commissionable).
 enum ServiceExportEnrichment {
 
     // MARK: - Plain Text
@@ -16,7 +16,7 @@ enum ServiceExportEnrichment {
         case "_matter._tcp", "_matter._udp", "_matterd._udp":
             return matterPlainText(name: service.name, txt: txt)
         case "_matterc._udp":
-            return matterCommissionerPlainText(txt: txt)
+            return matterCommissionablePlainText(txt: txt)
         default:
             return nil
         }
@@ -32,7 +32,7 @@ enum ServiceExportEnrichment {
         case "_matter._tcp", "_matter._udp", "_matterd._udp":
             return matterJSON(name: service.name, txt: txt)
         case "_matterc._udp":
-            return matterCommissionerJSON(txt: txt)
+            return matterCommissionableJSON(txt: txt)
         default:
             return nil
         }
@@ -157,9 +157,9 @@ enum ServiceExportEnrichment {
         return dict
     }
 
-    // MARK: - Matter Commissioner
+    // MARK: - Matter Commissionable
 
-    private static func matterCommissionerPlainText(
+    private static func matterCommissionablePlainText(
         txt: [String: String]
     ) -> (header: String, lines: [String]) {
         var lines: [String] = []
@@ -172,11 +172,11 @@ enum ServiceExportEnrichment {
             let desc = MatterDeviceTypes.description(for: dt)
             lines.append("Device Type: \(desc.map { "\(dt) (\($0))" } ?? dt)")
         }
-        return ("Matter Commissioner", lines)
+        return ("Matter Commissionable", lines)
     }
 
-    private static func matterCommissionerJSON(txt: [String: String]) -> [String: Any] {
-        var dict: [String: Any] = ["type": "matterCommissioner"]
+    private static func matterCommissionableJSON(txt: [String: String]) -> [String: Any] {
+        var dict: [String: Any] = ["type": "matterCommissionable"]
         if let val = txt["DN"] { dict["deviceName"] = val }
         if let vp = txt["VP"] {
             dict["vendorProduct"] = vp

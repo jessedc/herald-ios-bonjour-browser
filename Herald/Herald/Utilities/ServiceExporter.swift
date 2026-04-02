@@ -270,7 +270,7 @@ enum ServiceExporter {
         borderRouters: [ThreadBorderRouter],
         trelPeers: [TRELPeer],
         srpServers: [SRPServer],
-        commissioners: [MatterCommissioner]
+        commissionables: [MatterCommissionable]
     ) -> String {
         var lines: [String] = []
         lines.append("Thread Network — \(ISO8601DateFormatter().string(from: Date()))")
@@ -314,10 +314,10 @@ enum ServiceExporter {
             }
         }
 
-        if !commissioners.isEmpty {
+        if !commissionables.isEmpty {
             lines.append("")
-            lines.append("Commissioners (\(commissioners.count))")
-            for comm in commissioners {
+            lines.append("Commissionable (\(commissionables.count))")
+            for comm in commissionables {
                 lines.append("  • \(comm.name)")
                 if let dn = comm.deviceName {
                     lines.append("      Device Name: \(dn)")
@@ -349,7 +349,7 @@ enum ServiceExporter {
             }
         }
 
-        let total = borderRouters.count + trelPeers.count + srpServers.count + commissioners.count
+        let total = borderRouters.count + trelPeers.count + srpServers.count + commissionables.count
         if total == 0 {
             lines.append("")
             lines.append("No Thread network devices found.")
@@ -390,8 +390,8 @@ enum ServiceExporter {
         return jsonString(from: items)
     }
 
-    static func json(for commissioners: [MatterCommissioner]) -> String {
-        let items = commissioners.map { comm in commissionerDict(comm) }
+    static func json(for commissionables: [MatterCommissionable]) -> String {
+        let items = commissionables.map { comm in commissionableDict(comm) }
         return jsonString(from: items)
     }
 
@@ -399,7 +399,7 @@ enum ServiceExporter {
         borderRouters: [ThreadBorderRouter],
         trelPeers: [TRELPeer],
         srpServers: [SRPServer],
-        commissioners: [MatterCommissioner]
+        commissionables: [MatterCommissionable]
     ) -> String {
         let routerItems = borderRouters.map { router in borderRouterDict(router) }
         let trelItems = trelPeers.map { peer -> [String: Any] in
@@ -419,13 +419,13 @@ enum ServiceExporter {
             if let v = server.hostname { dict["hostname"] = v }
             return dict
         }
-        let commItems = commissioners.map { comm in commissionerDict(comm) }
+        let commItems = commissionables.map { comm in commissionableDict(comm) }
         let dict: [String: Any] = [
             "timestamp": ISO8601DateFormatter().string(from: Date()),
             "borderRouters": routerItems,
             "trelPeers": trelItems,
             "srpServers": srpItems,
-            "commissioners": commItems
+            "commissionables": commItems
         ]
         guard let data = try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .sortedKeys]),
               let str = String(data: data, encoding: .utf8) else {
@@ -578,7 +578,7 @@ enum ServiceExporter {
         return dict
     }
 
-    private static func commissionerDict(_ comm: MatterCommissioner) -> [String: Any] {
+    private static func commissionableDict(_ comm: MatterCommissionable) -> [String: Any] {
         var dict: [String: Any] = [
             "name": comm.name,
             "addresses": comm.addresses

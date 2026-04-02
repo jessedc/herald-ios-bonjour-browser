@@ -333,13 +333,13 @@ final class MockDataTests: XCTestCase {
             "SRP server should appear"
         )
 
-        let commissioner = app.staticTexts["Test Commissioner"]
-        if !commissioner.exists {
+        let commissionable = app.staticTexts["Test Commissionable"]
+        if !commissionable.exists {
             app.swipeUp()
         }
         XCTAssertTrue(
-            commissioner.waitForExistence(timeout: 1),
-            "Commissioner should appear"
+            commissionable.waitForExistence(timeout: 1),
+            "Commissionable device should appear"
         )
     }
 
@@ -624,22 +624,22 @@ final class MockDataTests: XCTestCase {
         XCTAssertTrue(app.navigationBars["Thread Network"].waitForExistence(timeout: 2))
     }
 
-    func testThreadCommissionerDetailNavigation() throws {
+    func testThreadCommissionableDetailNavigation() throws {
         app.tabBars.buttons["Thread"].tap()
         XCTAssertTrue(app.navigationBars["Thread Network"].waitForExistence(timeout: 2))
 
-        let commRow = app.buttons["thread.commissioner.row.Test Commissioner"]
+        let commRow = app.buttons["thread.commissionable.row.Test Commissionable"]
         if !commRow.waitForExistence(timeout: 1) {
             app.swipeUp()
         }
-        XCTAssertTrue(commRow.waitForExistence(timeout: 1), "Commissioner row should exist")
+        XCTAssertTrue(commRow.waitForExistence(timeout: 1), "Commissionable row should exist")
         commRow.tap()
 
         let serviceSection = app.staticTexts["Service"]
         let connection = app.otherElements["detail.connection"]
         let detailReached = serviceSection.waitForExistence(timeout: 5)
             || connection.waitForExistence(timeout: 5)
-        XCTAssertTrue(detailReached, "Service detail should load for commissioner")
+        XCTAssertTrue(detailReached, "Service detail should load for commissionable device")
 
         app.navigationBars.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(app.navigationBars["Thread Network"].waitForExistence(timeout: 2))
