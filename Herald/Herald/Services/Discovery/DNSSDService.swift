@@ -158,7 +158,7 @@ final class DNSSDService: @unchecked Sendable {
     /// Resolve a service instance to hostname, port, and TXT record.
     /// Uses shared connection to avoid daemon-side state corruption.
     /// All dns_sd calls are dispatched onto the serial queue to serialize access to the shared connection.
-    func resolve(name: String, type: String, domain: String) async throws -> (hostname: String, port: UInt16, txtRecord: [String: String]) {
+    func resolve(name: String, type: String, domain: String) async throws -> (hostname: String, port: UInt16, txtRecord: [String: TXTValue]) {
         logger.info("resolve: starting for '\(name)' type='\(type)' domain='\(domain)'")
 
         guard let parentRef = self.sharedRef else {
@@ -208,7 +208,8 @@ final class DNSSDService: @unchecked Sendable {
                         let hostname = String(cString: hosttarget)
                         let hostPort = UInt16(bigEndian: port)
                         let txt = DNSSDService.parseTXTRecordData(txtRecord, length: txtLen)
-                        logger.info("resolve callback: resolved to hostname='\(hostname)' port=\(hostPort) txtKeys=[\(txt.keys.joined(separator: ", "))]")
+                        logger.info(
+                            "resolve callback: resolved to hostname='\(hostname)' port=\(hostPort) txtKeys=[\(txt.keys.joined(separator: ", "))]")
                         ctx.didResume = true
                         ctx.continuation.resume(returning: (hostname, hostPort, txt))
                     },
@@ -246,25 +247,42 @@ final class DNSSDService: @unchecked Sendable {
     // MARK: - TXT Record Parsing
 
     /// Parse raw DNS TXT record data into a key-value dictionary.
-    static func parseTXTRecordData(_ data: UnsafePointer<UInt8>?, length: UInt16) -> [String: String] {
+    ///
+    /// Splits on the first `=` byte (0x3D) at the byte level without UTF-8 decoding
+    /// the value, per RFC 6763 §6.3: only the key is constrained to printable
+    /// ASCII; values are arbitrary bytes. Premature UTF-8 decoding of binary
+    /// values like Thread's Partition ID (`pt`) would silently mangle them.
+    static func parseTXTRecordData(_ data: UnsafePointer<UInt8>?, length: UInt16) -> [String: TXTValue] {
         guard let data = data, length > 0 else { return [:] }
-        var result: [String: String] = [:]
+        var result: [String: TXTValue] = [:]
         var offset = 0
         while offset < Int(length) {
             let strLen = Int(data[offset])
             offset += 1
             guard strLen > 0, offset + strLen <= Int(length) else { break }
-            let bytes = UnsafeBufferPointer(start: data.advanced(by: offset), count: strLen)
-            if let str = String(bytes: bytes, encoding: .utf8) {
-                if let eqIdx = str.firstIndex(of: "=") {
-                    let key = String(str[str.startIndex..<eqIdx])
-                    let value = String(str[str.index(after: eqIdx)...])
-                    result[key] = value
+            let entryStart = offset
+            let entryEnd = offset + strLen
+
+            // Scan raw bytes for the first 0x3D ('=').
+            var eqOffset = -1
+            for i in entryStart..<entryEnd where data[i] == 0x3D {
+                eqOffset = i
+                break
+            }
+
+            let keyEnd = eqOffset >= 0 ? eqOffset : entryEnd
+            let keyBytes = UnsafeBufferPointer(start: data.advanced(by: entryStart), count: keyEnd - entryStart)
+            // Keys must be printable ASCII per RFC 6763 §6.4; drop entries with invalid keys.
+            if let key = String(bytes: keyBytes, encoding: .utf8) {
+                if eqOffset >= 0 {
+                    let valueStart = eqOffset + 1
+                    let valueBytes = Data(bytes: data.advanced(by: valueStart), count: entryEnd - valueStart)
+                    result[key] = TXTValue(data: valueBytes)
                 } else {
-                    result[str] = ""
+                    result[key] = TXTValue(data: Data())
                 }
             }
-            offset += strLen
+            offset = entryEnd
         }
         return result
     }
@@ -342,7 +360,8 @@ final class DNSSDService: @unchecked Sendable {
 
                         let moreComing = (flags & kDNSServiceFlagsMoreComing) != 0
                         if !moreComing {
-                            logger.info("getAddresses callback: no more coming, resuming with \(ctx.ipv4.count) IPv4 + \(ctx.ipv6.count) IPv6 addresses")
+                            logger.info(
+                                "getAddresses callback: no more coming, resuming with \(ctx.ipv4.count) IPv4 + \(ctx.ipv6.count) IPv6 addresses")
                             ctx.didResume = true
                             ctx.continuation.resume(returning: (ctx.ipv4, ctx.ipv6))
                         } else {
@@ -369,6 +388,7 @@ final class DNSSDService: @unchecked Sendable {
                     let ctx = Unmanaged<AddressCallbackContext>.fromOpaque(cleanupCtx)
                         .takeUnretainedValue()
                     if !ctx.didResume {
+                        // swiftlint:disable:next line_length
                         logger.warning("getAddresses: 5s timeout reached, resuming with \(ctx.ipv4.count) IPv4 + \(ctx.ipv6.count) IPv6 addresses collected so far")
                         ctx.didResume = true
                         ctx.continuation.resume(returning: (ctx.ipv4, ctx.ipv6))
@@ -560,9 +580,9 @@ private final class BrowseInstancesCallbackContext {
 }
 
 private final class ResolveCallbackContext {
-    let continuation: CheckedContinuation<(hostname: String, port: UInt16, txtRecord: [String: String]), Error>
+    let continuation: CheckedContinuation<(hostname: String, port: UInt16, txtRecord: [String: TXTValue]), Error>
     var didResume = false
-    init(continuation: CheckedContinuation<(hostname: String, port: UInt16, txtRecord: [String: String]), Error>) {
+    init(continuation: CheckedContinuation<(hostname: String, port: UInt16, txtRecord: [String: TXTValue]), Error>) {
         self.continuation = continuation
     }
 }

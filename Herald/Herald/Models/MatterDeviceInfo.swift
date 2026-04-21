@@ -112,17 +112,17 @@ struct MatterDevice: Identifiable {
     // MARK: - Existing computed properties
 
     var serviceInstance: ServiceInstance {
-        var txt: [String: String] = [:]
-        if let v = discriminator { txt["D"] = v }
-        if let v = vendorProductID { txt["VP"] = v }
-        if let v = commissioningMode { txt["CM"] = v }
-        if let v = deviceType { txt["DT"] = v }
-        if let v = deviceName { txt["DN"] = v }
-        if let v = sessionIdleInterval { txt["SII"] = v }
-        if let v = sessionActiveInterval { txt["SAI"] = v }
-        if let v = tcpSupported { txt["T"] = v }
-        if let v = isICD { txt["ICD"] = v }
-        if let v = pairingHint { txt["PH"] = v }
+        var txt: [String: TXTValue] = [:]
+        if let v = discriminator { txt["D"] = TXTValue(v) }
+        if let v = vendorProductID { txt["VP"] = TXTValue(v) }
+        if let v = commissioningMode { txt["CM"] = TXTValue(v) }
+        if let v = deviceType { txt["DT"] = TXTValue(v) }
+        if let v = deviceName { txt["DN"] = TXTValue(v) }
+        if let v = sessionIdleInterval { txt["SII"] = TXTValue(v) }
+        if let v = sessionActiveInterval { txt["SAI"] = TXTValue(v) }
+        if let v = tcpSupported { txt["T"] = TXTValue(v) }
+        if let v = isICD { txt["ICD"] = TXTValue(v) }
+        if let v = pairingHint { txt["PH"] = TXTValue(v) }
         return ServiceInstance(name: name, type: serviceType, domain: "local.", txtRecord: txt)
     }
 

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1C0EB91F643C720A0106E98C /* TXTValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB48B9ED036AF8D608139CD2 /* TXTValueFormatter.swift */; };
 		1CC4895DBC3111EE1FFE4F18 /* BLEDiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F02C2612668D305DF986D4A5 /* BLEDiscoveryService.swift */; };
 		200000000000000000000001 /* HeraldApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000001 /* HeraldApp.swift */; };
 		200000000000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000002 /* ContentView.swift */; };
@@ -65,11 +66,13 @@
 		2000000000000000000000C4 /* ServiceExportEnrichment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1000000000000000000000C4 /* ServiceExportEnrichment.swift */; };
 		45AA909C2E68AEFCDA9E22FF /* MatterDeviceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 679A3A22D493DBC7DC66E1A8 /* MatterDeviceTests.swift */; };
 		5D3FA2775D8209E665258A99 /* ThreadBorderRouterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0745DBF05ED0C4AEC12F2ED3 /* ThreadBorderRouterTests.swift */; };
+		696EFCF158808767F1153B8C /* TXTValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B0180219745EBDD5C9DF781 /* TXTValue.swift */; };
 		88832DDE2F5C894600410D42 /* ServiceEnrichmentSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88832DDD2F5C894600410D42 /* ServiceEnrichmentSection.swift */; };
 		88A849D72F48D7CD0014A1AC /* LiveNetworkNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A849D62F48D7CD0014A1AC /* LiveNetworkNavigationTests.swift */; };
 		9B5C38CC7FE4B3E1967DBFC5 /* BLEDiscoveryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 682F1E5AFBE50F9EB9E0A607 /* BLEDiscoveryViewModel.swift */; };
 		A164A7DD46F549464A1D6E87 /* BLEPeripheralDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A512F0ED6D5171F1DCC0F1BE /* BLEPeripheralDetailView.swift */; };
 		B5E95F523D8AF3D2BC0F80BD /* BLEPeripheralInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4252056F3A247EA73614332C /* BLEPeripheralInfo.swift */; };
+		BF384EC653D9406AED81CAE4 /* TXTValueFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1364171FC76C43AFDF8033C1 /* TXTValueFormatterTests.swift */; };
 		CC91923AE752C2A3D7FD1E5B /* BluetoothView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96CA0FF60D5EC6A1FFEAFD64 /* BluetoothView.swift */; };
 		D0472EEA1D9029AD207C84D2 /* BLEPeripheralTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 681A1D23C1FAC85E4A9BBCFD /* BLEPeripheralTests.swift */; };
 		EB8D578F3C1F5318D47B2C03 /* NavigationStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3F2899185420F5C5A3DE7D2 /* NavigationStateTests.swift */; };
@@ -155,6 +158,7 @@
 		1000000000000000000000C2 /* CountThreadBorderRoutersIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountThreadBorderRoutersIntent.swift; sourceTree = "<group>"; };
 		1000000000000000000000C3 /* GetNetworkSummaryIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetNetworkSummaryIntent.swift; sourceTree = "<group>"; };
 		1000000000000000000000C4 /* ServiceExportEnrichment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceExportEnrichment.swift; sourceTree = "<group>"; };
+		1364171FC76C43AFDF8033C1 /* TXTValueFormatterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TXTValueFormatterTests.swift; sourceTree = "<group>"; };
 		4252056F3A247EA73614332C /* BLEPeripheralInfo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BLEPeripheralInfo.swift; sourceTree = "<group>"; };
 		679A3A22D493DBC7DC66E1A8 /* MatterDeviceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MatterDeviceTests.swift; sourceTree = "<group>"; };
 		681A1D23C1FAC85E4A9BBCFD /* BLEPeripheralTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BLEPeripheralTests.swift; sourceTree = "<group>"; };
@@ -165,7 +169,9 @@
 		88867C082F58C5E800677499 /* DNSSDTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = DNSSDTests.xctestplan; sourceTree = "<group>"; };
 		88A849D62F48D7CD0014A1AC /* LiveNetworkNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveNetworkNavigationTests.swift; sourceTree = "<group>"; };
 		96CA0FF60D5EC6A1FFEAFD64 /* BluetoothView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BluetoothView.swift; sourceTree = "<group>"; };
+		9B0180219745EBDD5C9DF781 /* TXTValue.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TXTValue.swift; sourceTree = "<group>"; };
 		A512F0ED6D5171F1DCC0F1BE /* BLEPeripheralDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BLEPeripheralDetailView.swift; sourceTree = "<group>"; };
+		CB48B9ED036AF8D608139CD2 /* TXTValueFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TXTValueFormatter.swift; sourceTree = "<group>"; };
 		F02C2612668D305DF986D4A5 /* BLEDiscoveryService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BLEDiscoveryService.swift; sourceTree = "<group>"; };
 		F3F2899185420F5C5A3DE7D2 /* NavigationStateTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NavigationStateTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -245,6 +251,7 @@
 				100000000000000000000007 /* ThreadNetworkInfo.swift */,
 				100000000000000000000041 /* ThreadPeerInfo.swift */,
 				4252056F3A247EA73614332C /* BLEPeripheralInfo.swift */,
+				9B0180219745EBDD5C9DF781 /* TXTValue.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -349,6 +356,7 @@
 				100000000000000000000030 /* MatterDeviceTypes.swift */,
 				100000000000000000000031 /* MatterVendorIDs.swift */,
 				100000000000000000000032 /* TXTRecordLabels.swift */,
+				CB48B9ED036AF8D608139CD2 /* TXTValueFormatter.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -408,6 +416,7 @@
 				681A1D23C1FAC85E4A9BBCFD /* BLEPeripheralTests.swift */,
 				0745DBF05ED0C4AEC12F2ED3 /* ThreadBorderRouterTests.swift */,
 				F3F2899185420F5C5A3DE7D2 /* NavigationStateTests.swift */,
+				1364171FC76C43AFDF8033C1 /* TXTValueFormatterTests.swift */,
 			);
 			path = HeraldTests;
 			sourceTree = "<group>";
@@ -448,7 +457,6 @@
 			children = (
 				F02C2612668D305DF986D4A5 /* BLEDiscoveryService.swift */,
 			);
-			name = Bluetooth;
 			path = Bluetooth;
 			sourceTree = "<group>";
 		};
@@ -458,7 +466,6 @@
 				96CA0FF60D5EC6A1FFEAFD64 /* BluetoothView.swift */,
 				A512F0ED6D5171F1DCC0F1BE /* BLEPeripheralDetailView.swift */,
 			);
-			name = Bluetooth;
 			path = Bluetooth;
 			sourceTree = "<group>";
 		};
@@ -647,6 +654,8 @@
 				9B5C38CC7FE4B3E1967DBFC5 /* BLEDiscoveryViewModel.swift in Sources */,
 				CC91923AE752C2A3D7FD1E5B /* BluetoothView.swift in Sources */,
 				A164A7DD46F549464A1D6E87 /* BLEPeripheralDetailView.swift in Sources */,
+				696EFCF158808767F1153B8C /* TXTValue.swift in Sources */,
+				1C0EB91F643C720A0106E98C /* TXTValueFormatter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -670,6 +679,7 @@
 				D0472EEA1D9029AD207C84D2 /* BLEPeripheralTests.swift in Sources */,
 				5D3FA2775D8209E665258A99 /* ThreadBorderRouterTests.swift in Sources */,
 				EB8D578F3C1F5318D47B2C03 /* NavigationStateTests.swift in Sources */,
+				BF384EC653D9406AED81CAE4 /* TXTValueFormatterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -830,7 +840,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -858,7 +868,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -871,6 +881,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HKAHNB7JV2;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
@@ -888,6 +899,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HKAHNB7JV2;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;

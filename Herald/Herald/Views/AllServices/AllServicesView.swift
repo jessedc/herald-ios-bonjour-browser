@@ -69,7 +69,7 @@ struct AllServicesView: View {
         return engine.allInstances.filter {
             $0.name.localizedStandardContains(searchText) ||
             $0.type.localizedStandardContains(searchText) ||
-            $0.txtRecord.values.contains { $0.localizedStandardContains(searchText) }
+            $0.txtRecord.values.contains { $0.asString.localizedStandardContains(searchText) }
         }
     }
 

@@ -15,6 +15,7 @@ struct ThreadNetworkView: View {
 
                 DiscoveryStatsSection(
                     chips: [
+                        StatChipData(count: viewModel.networks.count, label: "Networks", icon: "network"),
                         StatChipData(count: viewModel.service.borderRouters.count, label: "Routers", icon: "wifi.router"),
                         StatChipData(count: viewModel.service.trelPeers.count, label: "TREL", icon: "antenna.radiowaves.left.and.right"),
                         StatChipData(count: viewModel.service.commissionables.count, label: "Commissionable", icon: "dot.radiowaves.right"),
@@ -23,16 +24,23 @@ struct ThreadNetworkView: View {
                     errors: viewModel.errors
                 )
 
-                // Border Routers
-                if !viewModel.service.borderRouters.isEmpty {
-                    Section("Border Routers (\(viewModel.service.borderRouters.count))") {
-                        ForEach(viewModel.service.borderRouters) { router in
+                // Border Routers — grouped by Thread network (Extended PAN ID)
+                ForEach(viewModel.networks) { network in
+                    Section {
+                        // Config drift / mismatch warnings
+                        ForEach(network.warnings, id: \.self) { warning in
+                            Label(warning, systemImage: "exclamationmark.triangle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.orange)
+                                .listRowBackground(Color.orange.opacity(0.1))
+                        }
+
+                        ForEach(network.routers) { router in
                             NavigationLink(value: router.serviceInstance) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(router.name)
                                         .font(.headline)
                                     Group {
-                                        LabeledContent("Network", value: router.networkName)
                                         if let vendor = router.vendor {
                                             LabeledContent("Vendor", value: vendor)
                                         }
@@ -41,9 +49,6 @@ struct ThreadNetworkView: View {
                                         }
                                         if let version = router.threadVersion {
                                             LabeledContent("Thread Version", value: version)
-                                        }
-                                        if !router.extendedPANID.isEmpty {
-                                            LabeledContent("Extended PAN ID", value: router.extendedPANID)
                                         }
                                         if !router.stateBitmapFlags.isEmpty {
                                             LabeledContent("State", value: router.stateBitmapFlags.joined(separator: ", "))
@@ -54,12 +59,33 @@ struct ThreadNetworkView: View {
                                         if router.backboneRouterFlag != nil {
                                             LabeledContent("Backbone Router", value: "Yes")
                                         }
+                                        if let at = router.activeTimestamp, network.hasConfigDrift {
+                                            LabeledContent("Active Timestamp", value: at)
+                                                .foregroundStyle(.orange)
+                                        }
                                     }
                                     .font(.caption)
                                 }
                                 .padding(.vertical, 2)
                             }
                             .accessibilityIdentifier("thread.router.row.\(router.name)")
+                        }
+                    } header: {
+                        HStack {
+                            Text("\(network.networkName) — \(network.routers.count) \(network.routers.count == 1 ? "router" : "routers")")
+                            if !network.warnings.isEmpty {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundStyle(.orange)
+                                    .font(.caption2)
+                            }
+                        }
+                    } footer: {
+                        if let xp = network.extendedPANID {
+                            Text("Extended PAN ID: \(xp)")
+                                .font(.caption2)
+                        } else {
+                            Text("Extended PAN ID: not advertised")
+                                .font(.caption2)
                         }
                     }
                 }
@@ -141,7 +167,13 @@ struct ThreadNetworkView: View {
                     }
                 }
             }
-            .animation(.default, value: viewModel.service.borderRouters.count + viewModel.service.trelPeers.count + viewModel.service.commissionables.count + viewModel.service.srpServers.count)
+            .animation(
+                .default,
+                value: viewModel.service.borderRouters.count
+                    + viewModel.service.trelPeers.count
+                    + viewModel.service.commissionables.count
+                    + viewModel.service.srpServers.count
+            )
             .navigationDestination(for: ServiceInstance.self) { instance in
                 ServiceDetailView(instance: instance)
             }

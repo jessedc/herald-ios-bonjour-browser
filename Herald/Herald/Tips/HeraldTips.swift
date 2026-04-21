@@ -48,8 +48,8 @@ struct MatterFabricsTip: Tip {
     }
 
     var message: Text? {
-        // swiftlint:disable:next line_length
-        Text("Operational Matter devices are grouped by fabric. Each fabric represents a differen controller ecosystem.")
+        Text("Operational Matter devices are grouped by fabric. "
+            + "Each fabric represents a different controller ecosystem.")
     }
 
     var image: Image? {
@@ -89,8 +89,8 @@ struct BluetoothScanTip: Tip {
     }
 
     var message: Text? {
-        // swiftlint:disable:next line_length
-        Text("Scans for nearby Bluetooth Low Energy devices. Matter devices in commissioning mode advertise over BLE before joining a network.")
+        Text("Scans for nearby Bluetooth Low Energy devices. "
+            + "Matter devices in commissioning mode advertise over BLE before joining a network.")
     }
 
     var image: Image? {

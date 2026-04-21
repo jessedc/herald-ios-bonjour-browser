@@ -72,6 +72,31 @@ SwiftLint is included as a local SPM command plugin — no global install needed
 ./scripts/lint.sh --fix    # Auto-fix
 ```
 
+## Command-Line Tool (herald)
+
+`herald` is a macOS companion that exposes the iOS "All Services" discovery on the command line with JSON output. It lives in its own SPM package under `HeraldCLI/` and reuses the iOS app's `DNSSDService` via symlinked shared sources.
+
+```bash
+cd HeraldCLI
+
+# Build
+swift build
+
+# List the Bonjour service types herald knows about (with descriptions)
+swift run herald types
+
+# Browse a single type for 4 seconds and print the resulting instance set
+swift run herald browse _airplay._tcp --duration 4
+
+# Resolve an instance to hostname, port, IPv4/IPv6, and TXT record
+swift run herald resolve "Living Room" _airplay._tcp
+
+# See all subcommands and options
+swift run herald --help
+```
+
+Pass `--compact` to any subcommand for single-line JSON (ideal for piping into `jq`). Errors are emitted as a JSON object on stderr with a non-zero exit code.
+
 ## Architecture
 
 ### Discovery Flow
@@ -115,6 +140,12 @@ Herald/
     │   └── Common/             # Shared components (ErrorRow, LabeledRow, ExportToolbarModifier, etc.)
     ├── Utilities/              # ServiceTypeDescriptions, ServiceExporter, TXTRecordLabels, etc.
     └── Resources/              # Info.plist, Herald.entitlements, app icons
+HeraldCLI/                      # macOS command-line companion (herald)
+├── Package.swift
+└── Sources/herald/
+    ├── Commands/               # types, browse, resolve
+    ├── Output/                 # JSON encoder + DTOs
+    └── Shared/                 # Symlinks to Herald/Herald/{Services,Models,Utilities}
 ```
 
 ## Adding New Service Types

@@ -20,7 +20,7 @@ if [ -z "$PNGCRUSH" ]; then
 fi
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-ICON_SRC="$REPO_ROOT/Herald/Herald/Resources/Assets.xcassets/AppIcon.appiconset/logo-draft-2.png"
+ICON_SRC="$REPO_ROOT/Herald/Herald/Resources/Assets.xcassets/AppIcon.appiconset/logo.png"
 SCREENSHOTS_SRC="$REPO_ROOT/screenshots/6.9-inch"
 
 ICON_DEST="$REPO_ROOT/docs/assets/icon"

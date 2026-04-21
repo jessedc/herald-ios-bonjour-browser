@@ -36,7 +36,7 @@ final class ServiceDetailViewModel: ObservableObject, TextExportable {
     }
 
     /// Best available TXT record — resolved data takes priority over browse data.
-    var txtRecord: [String: String] {
+    var txtRecord: [String: TXTValue] {
         resolved?.txtRecord ?? instance.txtRecord
     }
 

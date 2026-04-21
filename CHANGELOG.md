@@ -1,5 +1,22 @@
 # Changelog
 
+## Version 1.4
+
+### Thread Network Grouping
+Border routers are now grouped by Thread network so routers on the same mesh appear together under a shared header. Grouping uses the Network Name (`nn`) with fallback to Extended PAN ID (`xp`) if present.
+
+### Decoded Binary TXT Records
+TXT record values that arrive as raw bytes — Thread's Partition ID (`pt`), Extended PAN ID (`xp`), State Bitmap (`sb`), and similar MeshCoP fields — are now decoded correctly. The service detail view shows a two-line decoded + hex layout per key, with type-aware formatting (uint32, colon-separated IDs, state bitmap flags) and a printable-or-hex fallback for unknown keys.
+
+### Config Drift Detection (Experimental)
+Thread sections now surface mismatches in Active Timestamp and Extended PAN ID within a group, so you can spot when border routers on the same mesh disagree about the current dataset or have collided with a neighbour mesh. Per-router timestamps render in orange only when drift is detected.
+
+### herald macOS CLI
+A new `herald` command-line companion lives in `HeraldCLI/` and brings the "All Services" tab to the terminal with three subcommands: `types` lists known service types, `browse` time-boxes a Bonjour browse, and `resolve` returns the full detail payload (hostname, port, IPv4/IPv6, labelled TXT records). Output is JSON on stdout with a `--compact` flag for `jq` piping.
+
+### Bug Fixes
+- Renamed "Commissioners" to "Commissionable" in the Thread tab to match Matter spec terminology for `_matterc._udp` devices
+
 ## Version 1.3
 
 ### Matter Commissioning

@@ -1,0 +1,1 @@
+../../../../Herald/Herald/Models/ResolvedService.swift

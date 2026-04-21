@@ -123,14 +123,11 @@ struct ServiceDetailView: View {
                         viewModel.txtRecord.sorted(by: { $0.key < $1.key }),
                         id: \.key
                     ) { key, value in
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(TXTRecordLabels.displayKey(for: key, serviceType: viewModel.instance.type))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Text(value.isEmpty ? "(empty)" : value)
-                                .font(.system(.body, design: .monospaced))
-                                .textSelection(.enabled)
-                        }
+                        TXTRecordRow(
+                            key: key,
+                            value: value,
+                            serviceType: viewModel.instance.type
+                        )
                     }
                 }
             }
@@ -148,3 +145,52 @@ struct ServiceDetailView: View {
 }
 
 struct ReverseDNSInfoDestination: Hashable {}
+
+/// Renders a single TXT record entry. Binary-classified keys show the decoded
+/// primary form on top (e.g. `239,224,144` for Thread Partition ID) with the
+/// canonical hex underneath; text keys show the UTF-8 string; unknown-key
+/// heuristics fall back to printable-or-hex.
+private struct TXTRecordRow: View {
+    let key: String
+    let value: TXTValue
+    let serviceType: String
+
+    var body: some View {
+        let display = TXTValueFormatter.format(key: key, data: value.data, serviceType: serviceType)
+        VStack(alignment: .leading, spacing: 2) {
+            Text(TXTRecordLabels.displayKey(for: key, serviceType: serviceType))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            switch display {
+            case .empty:
+                Text("(empty)")
+                    .foregroundStyle(.secondary)
+                    .italic()
+            case .text(let s):
+                Text(s)
+                    .font(.system(.body, design: .monospaced))
+                    .textSelection(.enabled)
+            case .hex(let hex):
+                Text(hex)
+                    .font(.system(.body, design: .monospaced))
+                    .textSelection(.enabled)
+            case .decoded(let primary, let hex):
+                Text(primary)
+                    .font(.body)
+                    .textSelection(.enabled)
+                Text("0x\(hex)")
+                    .font(.system(.caption, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+            case .flags(let hex, let description):
+                Text(description)
+                    .font(.body)
+                    .textSelection(.enabled)
+                Text("0x\(hex)")
+                    .font(.system(.caption, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+            }
+        }
+    }
+}

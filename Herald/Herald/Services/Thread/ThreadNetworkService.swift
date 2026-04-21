@@ -128,19 +128,21 @@ final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
                         let txt = resolved.txtRecord
                         return ThreadBorderRouter(
                             name: name,
-                            networkName: txt["nn"] ?? "Unknown",
-                            extendedPANID: txt["xp"] ?? "",
-                            panID: txt["pi"],
-                            vendor: txt["vn"],
-                            modelName: txt["mn"],
-                            threadVersion: txt["tv"],
-                            stateBitmap: txt["sb"],
-                            activeTimestamp: txt["at"],
-                            pendingTimestamp: txt["pt"],
-                            sequenceNumber: txt["sq"],
-                            backboneRouterFlag: txt["bb"],
-                            domainName: txt["dn"],
-                            deviceDiscriminator: txt["dd"],
+                            networkName: txt["nn"]?.asString ?? "Unknown",
+                            extendedPANID: txt["xp"].map {
+                                TXTValueFormatter.format(key: "xp", data: $0.data, serviceType: "_meshcop._udp").primaryString
+                            },
+                            panID: txt["pi"]?.asString,
+                            vendor: txt["vn"]?.asString,
+                            modelName: txt["mn"]?.asString,
+                            threadVersion: txt["tv"]?.asString,
+                            stateBitmap: txt["sb"].map { TXTValueFormatter.hexString($0.data) },
+                            activeTimestamp: txt["at"].map { TXTValueFormatter.hexString($0.data) },
+                            partitionID: txt["pt"].flatMap { ThreadBorderRouter.partitionID(from: $0.data) },
+                            sequenceNumber: txt["sq"]?.asString,
+                            backboneRouterFlag: txt["bb"]?.asString,
+                            domainName: txt["dn"]?.asString,
+                            deviceDiscriminator: txt["dd"]?.asString,
                             hostname: resolved.hostname,
                             addresses: []
                         )
@@ -149,14 +151,14 @@ final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
                         return ThreadBorderRouter(
                             name: name,
                             networkName: "Unknown",
-                            extendedPANID: "",
+                            extendedPANID: nil,
                             panID: nil,
                             vendor: nil,
                             modelName: nil,
                             threadVersion: nil,
                             stateBitmap: nil,
                             activeTimestamp: nil,
-                            pendingTimestamp: nil,
+                            partitionID: nil,
                             sequenceNumber: nil,
                             backboneRouterFlag: nil,
                             domainName: nil,
@@ -241,10 +243,10 @@ final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
                         let txt = resolved.txtRecord
                         return MatterCommissionable(
                             name: name,
-                            deviceName: txt["DN"],
-                            vendorProductID: txt["VP"],
-                            deviceType: txt["DT"],
-                            commissioningMode: txt["CM"],
+                            deviceName: txt["DN"]?.asString,
+                            vendorProductID: txt["VP"]?.asString,
+                            deviceType: txt["DT"]?.asString,
+                            commissioningMode: txt["CM"]?.asString,
                             hostname: resolved.hostname,
                             addresses: []
                         )
@@ -307,7 +309,7 @@ final class ThreadNetworkService: ObservableObject, UITestingConfigurable {
                 threadVersion: "1.3.0",
                 stateBitmap: nil,
                 activeTimestamp: nil,
-                pendingTimestamp: nil,
+                partitionID: nil,
                 sequenceNumber: nil,
                 backboneRouterFlag: nil,
                 domainName: nil,

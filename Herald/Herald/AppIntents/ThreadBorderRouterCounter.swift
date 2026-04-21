@@ -83,7 +83,7 @@ struct ThreadBorderRouterCounter {
                             type: "_meshcop._udp",
                             domain: "local."
                         )
-                        return resolved.txtRecord["nn"]
+                        return resolved.txtRecord["nn"]?.asString
                     } catch {
                         return nil
                     }

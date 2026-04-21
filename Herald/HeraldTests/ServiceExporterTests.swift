@@ -134,11 +134,12 @@ final class ServiceExporterTests: XCTestCase {
         // No enrichment for _http._tcp
         XCTAssertNil(parsed["enrichment"])
 
-        // TXT Record with label structure
+        // TXT Record with structured {hex, text?, decoded?, label?} shape
         let txtRecord = parsed["txtRecord"] as! [String: Any]
         let pathEntry = txtRecord["path"] as! [String: String]
-        XCTAssertEqual(pathEntry["key"], "path")
-        XCTAssertEqual(pathEntry["value"], "/api")
+        XCTAssertEqual(pathEntry["text"], "/api")
+        // hex is the UTF-8 encoding of "/api" = 2F 61 70 69
+        XCTAssertEqual(pathEntry["hex"], "2F617069")
 
         // Raw data preserves flat structure
         let raw = parsed["rawData"] as! [String: Any]
@@ -236,6 +237,9 @@ final class ServiceExporterTests: XCTestCase {
     // MARK: - Enrichment: Thread Border Router
 
     func testResolvedServicePlainTextThreadEnrichment() {
+        // Extended PAN ID is 8 raw big-endian bytes on the wire; the formatter
+        // renders it as uppercase colon-separated hex.
+        let xpBytes = Data([0xDE, 0xAD, 0x00, 0xBE, 0xEF, 0x00, 0xCA, 0xFE])
         let service = ResolvedService(
             name: "HomePod mini",
             type: "_meshcop._udp",
@@ -246,7 +250,7 @@ final class ServiceExporterTests: XCTestCase {
             ipv6Addresses: [],
             txtRecord: [
                 "nn": "MyThread", "vn": "Apple", "mn": "HomePod mini",
-                "tv": "1.3.0", "xp": "dead00beef00cafe", "pi": "face",
+                "tv": "1.3.0", "xp": TXTValue(data: xpBytes), "pi": "face",
                 "dn": "DefaultDomain", "bb": "1"
             ],
             resolvedAt: Date()
@@ -258,7 +262,7 @@ final class ServiceExporterTests: XCTestCase {
         XCTAssertTrue(text.contains("Vendor: Apple"))
         XCTAssertTrue(text.contains("Model: HomePod mini"))
         XCTAssertTrue(text.contains("Thread Version: 1.3.0"))
-        XCTAssertTrue(text.contains("Extended PAN ID: dead00beef00cafe"))
+        XCTAssertTrue(text.contains("Extended PAN ID: DE:AD:00:BE:EF:00:CA:FE"))
         XCTAssertTrue(text.contains("PAN ID: face"))
         XCTAssertTrue(text.contains("Domain Name: DefaultDomain"))
         XCTAssertTrue(text.contains("Backbone Router: Yes"))
@@ -513,14 +517,15 @@ final class ServiceExporterTests: XCTestCase {
 
         let txtRecord = parsed["txtRecord"] as! [String: Any]
         let rpEntry = txtRecord["rp"] as! [String: String]
-        XCTAssertEqual(rpEntry["key"], "rp")
         XCTAssertEqual(rpEntry["label"], "Resource Path")
-        XCTAssertEqual(rpEntry["value"], "ipp/print")
+        XCTAssertEqual(rpEntry["text"], "ipp/print")
+        // "ipp/print" → 69 70 70 2F 70 72 69 6E 74
+        XCTAssertEqual(rpEntry["hex"], "6970702F7072696E74")
 
-        // Raw data preserves flat txtRecord
+        // Raw data section keeps a flat map but with hex values for unambiguous bytes
         let raw = parsed["rawData"] as! [String: Any]
         let rawTxt = raw["txtRecord"] as! [String: String]
-        XCTAssertEqual(rawTxt["rp"], "ipp/print")
+        XCTAssertEqual(rawTxt["rp"], "6970702F7072696E74")
     }
 
     // MARK: - Raw Data Section
@@ -694,7 +699,9 @@ final class ServiceExporterTests: XCTestCase {
 
         let svc1 = services.first { ($0["name"] as? String) == "Svc1" }!
         XCTAssertEqual(svc1["type"] as? String, "_http._tcp")
-        XCTAssertEqual((svc1["txtRecord"] as? [String: String])?["a"], "b")
+        let svc1Txt = svc1["txtRecord"] as! [String: Any]
+        let aEntry = svc1Txt["a"] as! [String: String]
+        XCTAssertEqual(aEntry["text"], "b")
     }
 
     func testInstanceListJSONEmptyInput() {
@@ -719,7 +726,7 @@ final class ServiceExporterTests: XCTestCase {
                 vendor: "Apple",
                 modelName: "HomePod mini",
                 threadVersion: "1.3.0",
-                stateBitmap: nil, activeTimestamp: nil, pendingTimestamp: nil,
+                stateBitmap: nil, activeTimestamp: nil, partitionID: nil,
                 sequenceNumber: nil, backboneRouterFlag: nil, domainName: nil,
                 deviceDiscriminator: nil,
                 hostname: "homepod.local.",
@@ -729,9 +736,10 @@ final class ServiceExporterTests: XCTestCase {
         let text = ServiceExporter.plainText(for: routers)
 
         XCTAssertTrue(text.contains("Thread Border Routers"))
-        XCTAssertTrue(text.contains("Border Routers (1)"))
+        XCTAssertTrue(text.contains("Border Routers (1 across 1 network)"))
+        XCTAssertTrue(text.contains("[MyThread]"))
+        XCTAssertTrue(text.contains("Extended PAN ID: dead00beef00cafe"))
         XCTAssertTrue(text.contains("• HomePod"))
-        XCTAssertTrue(text.contains("Network: MyThread"))
         XCTAssertTrue(text.contains("Vendor: Apple"))
         XCTAssertTrue(text.contains("Model: HomePod mini"))
         XCTAssertTrue(text.contains("Thread Version: 1.3.0"))
@@ -747,7 +755,7 @@ final class ServiceExporterTests: XCTestCase {
                 vendor: nil,
                 modelName: nil,
                 threadVersion: nil,
-                stateBitmap: nil, activeTimestamp: nil, pendingTimestamp: nil,
+                stateBitmap: nil, activeTimestamp: nil, partitionID: nil,
                 sequenceNumber: nil, backboneRouterFlag: nil, domainName: nil,
                 deviceDiscriminator: nil,
                 hostname: nil,
@@ -757,7 +765,7 @@ final class ServiceExporterTests: XCTestCase {
         let text = ServiceExporter.plainText(for: routers)
 
         XCTAssertTrue(text.contains("• Basic"))
-        XCTAssertTrue(text.contains("Network: Net"))
+        XCTAssertTrue(text.contains("[Net]"))
         XCTAssertFalse(text.contains("Vendor:"))
         XCTAssertFalse(text.contains("Model:"))
         XCTAssertFalse(text.contains("Thread Version:"))
@@ -881,7 +889,7 @@ final class ServiceExporterTests: XCTestCase {
             ThreadBorderRouter(
                 name: "Router1", networkName: "Net", extendedPANID: "0001",
                 panID: nil, vendor: "Apple", modelName: nil, threadVersion: "1.3.0",
-                stateBitmap: nil, activeTimestamp: nil, pendingTimestamp: nil,
+                stateBitmap: nil, activeTimestamp: nil, partitionID: nil,
                 sequenceNumber: nil, backboneRouterFlag: nil, domainName: nil,
                 deviceDiscriminator: nil, hostname: nil, addresses: []
             )
@@ -907,7 +915,8 @@ final class ServiceExporterTests: XCTestCase {
         )
 
         XCTAssertTrue(text.contains("Thread Network"))
-        XCTAssertTrue(text.contains("Border Routers (1)"))
+        XCTAssertTrue(text.contains("Border Routers (1 across 1 network)"))
+        XCTAssertTrue(text.contains("[Net]"))
         XCTAssertTrue(text.contains("• Router1"))
         XCTAssertTrue(text.contains("Vendor: Apple"))
 
@@ -932,7 +941,7 @@ final class ServiceExporterTests: XCTestCase {
                 ThreadBorderRouter(
                     name: "R", networkName: "N", extendedPANID: "0",
                     panID: nil, vendor: nil, modelName: nil, threadVersion: nil,
-                    stateBitmap: nil, activeTimestamp: nil, pendingTimestamp: nil,
+                    stateBitmap: nil, activeTimestamp: nil, partitionID: nil,
                     sequenceNumber: nil, backboneRouterFlag: nil, domainName: nil,
                     deviceDiscriminator: nil, hostname: nil, addresses: []
                 )
@@ -942,7 +951,7 @@ final class ServiceExporterTests: XCTestCase {
             commissionables: []
         )
 
-        XCTAssertTrue(text.contains("Border Routers (1)"))
+        XCTAssertTrue(text.contains("Border Routers (1 across 1 network)"))
         XCTAssertFalse(text.contains("TREL Peers"))
         XCTAssertFalse(text.contains("SRP Servers"))
         XCTAssertFalse(text.contains("Commissionable"))

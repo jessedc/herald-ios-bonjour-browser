@@ -1,4 +1,3 @@
-// swiftlint:disable function_body_length type_body_length
 import Foundation
 
 /// Realistic mock data for App Store screenshot capture.
@@ -176,6 +175,7 @@ enum ScreenshotMockData {
     // MARK: - Thread Network
 
     static let borderRouters: [ThreadBorderRouter] = [
+        // HomeThread network — 3 routers, consistent config
         ThreadBorderRouter(
             name: "Living Room HomePod mini",
             networkName: "HomeThread",
@@ -184,11 +184,11 @@ enum ScreenshotMockData {
             vendor: "Apple Inc.",
             modelName: "AudioAccessory6,1",
             threadVersion: "1.3.0",
-            stateBitmap: nil,
-            activeTimestamp: nil,
-            pendingTimestamp: nil,
+            stateBitmap: "19",
+            activeTimestamp: "000000002A13B664",
+            partitionID: nil,
             sequenceNumber: nil,
-            backboneRouterFlag: nil,
+            backboneRouterFlag: "1",
             domainName: nil,
             deviceDiscriminator: nil,
             hostname: "Living-Room-HomePod-mini.local.",
@@ -202,9 +202,9 @@ enum ScreenshotMockData {
             vendor: "Apple Inc.",
             modelName: "AudioAccessory6,1",
             threadVersion: "1.3.0",
-            stateBitmap: nil,
-            activeTimestamp: nil,
-            pendingTimestamp: nil,
+            stateBitmap: "19",
+            activeTimestamp: "000000002A13B664",
+            partitionID: nil,
             sequenceNumber: nil,
             backboneRouterFlag: nil,
             domainName: nil,
@@ -220,15 +220,52 @@ enum ScreenshotMockData {
             vendor: "Apple Inc.",
             modelName: "AppleTV14,1",
             threadVersion: "1.3.0",
-            stateBitmap: nil,
-            activeTimestamp: nil,
-            pendingTimestamp: nil,
+            stateBitmap: "19",
+            activeTimestamp: "000000002A13B664",
+            partitionID: nil,
             sequenceNumber: nil,
             backboneRouterFlag: nil,
             domainName: nil,
             deviceDiscriminator: nil,
             hostname: "Office-Apple-TV-4K.local.",
             addresses: ["10.0.1.22", "fe80::1a2b:3c4d:5e6f:1003"]
+        ),
+        // GuestThread network — 2 routers, config drift (mismatched Active Timestamp)
+        ThreadBorderRouter(
+            name: "Google Nest Hub",
+            networkName: "GuestThread",
+            extendedPANID: "f0e1d2c3b4a59687",
+            panID: "ab12",
+            vendor: "Google Inc.",
+            modelName: "Nest Hub Max",
+            threadVersion: "1.3.0",
+            stateBitmap: "0F",
+            activeTimestamp: "0000000018E3A21C",
+            partitionID: nil,
+            sequenceNumber: nil,
+            backboneRouterFlag: "1",
+            domainName: "guest.thread.home.arpa.",
+            deviceDiscriminator: nil,
+            hostname: "Google-Nest-Hub.local.",
+            addresses: ["10.0.1.50", "fe80::aabb:ccdd:eeff:5001"]
+        ),
+        ThreadBorderRouter(
+            name: "Eero 6 Pro",
+            networkName: "GuestThread",
+            extendedPANID: "f0e1d2c3b4a59687",
+            panID: "ab12",
+            vendor: "Amazon",
+            modelName: "Eero 6 Pro",
+            threadVersion: "1.3.0",
+            stateBitmap: "0B",
+            activeTimestamp: "0000000018E3A100",
+            partitionID: nil,
+            sequenceNumber: nil,
+            backboneRouterFlag: nil,
+            domainName: "guest.thread.home.arpa.",
+            deviceDiscriminator: nil,
+            hostname: "Eero-6-Pro.local.",
+            addresses: ["10.0.1.51", "fe80::aabb:ccdd:eeff:5002"]
         )
     ]
 
@@ -357,7 +394,7 @@ enum ScreenshotMockData {
 
     static let blePeripherals: [BLEPeripheral] = [
         BLEPeripheral(
-            identifier: UUID(uuidString: "A1B2C3D4-E5F6-7890-ABCD-EF1234567890")!,
+            identifier: UUID(uuidString: "A1B2C3D4-E5F6-7890-ABCD-EF1234567890") ?? UUID(),
             localName: "Nanoleaf Strip A087",
             advertisedServiceUUIDs: ["FFF6"],
             manufacturerData: nil,
@@ -368,7 +405,7 @@ enum ScreenshotMockData {
             lastSeen: Date()
         ),
         BLEPeripheral(
-            identifier: UUID(uuidString: "B2C3D4E5-F6A7-8901-BCDE-F12345678901")!,
+            identifier: UUID(uuidString: "B2C3D4E5-F6A7-8901-BCDE-F12345678901") ?? UUID(),
             localName: "Eve Room B204",
             advertisedServiceUUIDs: ["FFF6"],
             manufacturerData: nil,
@@ -380,4 +417,3 @@ enum ScreenshotMockData {
         )
     ]
 }
-// swiftlint:enable function_body_length type_body_length

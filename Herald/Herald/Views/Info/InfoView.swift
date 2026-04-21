@@ -57,13 +57,17 @@ struct InfoView: View {
                         Text("All educational tips will appear again.")
                     }
                 }
-                
+
                 Section("More Info") {
-                    Link(destination: URL(string: "https://heraldapp.app")!) {
-                        Label("Website", systemImage: "globe")
+                    if let url = URL(string: "https://heraldapp.app") {
+                        Link(destination: url) {
+                            Label("Website", systemImage: "globe")
+                        }
                     }
-                    Link(destination: URL(string: "https://github.com/jessedc/herald-ios-bonjour-browser")!) {
-                        Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                    if let url = URL(string: "https://github.com/jessedc/herald-ios-bonjour-browser") {
+                        Link(destination: url) {
+                            Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                        }
                     }
                 }
 

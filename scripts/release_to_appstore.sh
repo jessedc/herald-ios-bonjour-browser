@@ -70,6 +70,7 @@ run_asc() {
 
 # Global state
 DRY_RUN=false
+SKIP_SCREENSHOTS=false
 BUILD_ID=""
 APP_ID=""
 VERSION=""
@@ -88,6 +89,7 @@ Automate App Store Connect release preparations for Herald.
 
 OPTIONS:
   --build-id BUILD_ID   Use a specific build ID (skip interactive selection)
+  --skip-screenshots    Skip uploading screenshots (keep existing ones in App Store Connect)
   --dry-run             Show what would happen without making changes
   --help, -h            Show this help message
 
@@ -160,6 +162,10 @@ parse_args() {
         fi
         BUILD_ID="$2"
         shift 2
+        ;;
+      --skip-screenshots)
+        SKIP_SCREENSHOTS=true
+        shift
         ;;
       --dry-run)
         DRY_RUN=true
@@ -527,6 +533,11 @@ delete_existing_screenshots() {
 
 upload_screenshots() {
   echo "==> Uploading screenshots..."
+
+  if $SKIP_SCREENSHOTS; then
+    echo -e "  ${YELLOW}Skipping screenshot upload (--skip-screenshots).${RESET}"
+    return
+  fi
 
   if [[ ! -d "$SCREENSHOTS_DIR" ]]; then
     echo -e "${YELLOW}  Warning: screenshots/ directory not found. Skipping.${RESET}"

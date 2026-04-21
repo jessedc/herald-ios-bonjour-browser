@@ -45,11 +45,11 @@ struct MatterCommissionable: Identifiable {
     }
 
     var serviceInstance: ServiceInstance {
-        var txt: [String: String] = [:]
-        if let v = deviceName { txt["DN"] = v }
-        if let v = vendorProductID { txt["VP"] = v }
-        if let v = deviceType { txt["DT"] = v }
-        if let v = commissioningMode { txt["CM"] = v }
+        var txt: [String: TXTValue] = [:]
+        if let v = deviceName { txt["DN"] = TXTValue(v) }
+        if let v = vendorProductID { txt["VP"] = TXTValue(v) }
+        if let v = deviceType { txt["DT"] = TXTValue(v) }
+        if let v = commissioningMode { txt["CM"] = TXTValue(v) }
         return ServiceInstance(name: name, type: "_matterc._udp", domain: "local.", txtRecord: txt)
     }
 }

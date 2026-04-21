@@ -60,14 +60,15 @@ enum ServiceExporter {
             }
         }
 
-        // TXT Record (with human-readable labels)
+        // TXT Record (with human-readable labels + decoded binary values)
         if !service.txtRecord.isEmpty {
             lines.append("")
             lines.append("## TXT Record")
             for (key, value) in service.txtRecord.sorted(by: { $0.key < $1.key }) {
                 let displayKey = TXTRecordLabels.displayKey(for: key, serviceType: service.type)
-                let displayValue = value.isEmpty ? "(empty)" : value
-                lines.append("\(displayKey) = \(displayValue)")
+                let display = TXTValueFormatter.format(key: key, data: value.data, serviceType: service.type)
+                let primary = display == .empty ? "(empty)" : display.primaryString
+                lines.append("\(displayKey) = \(primary)")
             }
         }
 
@@ -113,15 +114,11 @@ enum ServiceExporter {
             dict["reverseDNS"] = service.reverseDNS
         }
 
-        // TXT Record (with labels)
+        // TXT Record (structured: key → {hex, text?, decoded?, label?})
         if !service.txtRecord.isEmpty {
             var labeled: [String: Any] = [:]
             for (key, value) in service.txtRecord {
-                var entry: [String: String] = ["key": key, "value": value]
-                if let label = TXTRecordLabels.label(for: key, serviceType: service.type) {
-                    entry["label"] = label
-                }
-                labeled[key] = entry
+                labeled[key] = txtRecordEntryJSON(key: key, value: value, serviceType: service.type)
             }
             dict["txtRecord"] = labeled
         }
@@ -152,7 +149,8 @@ enum ServiceExporter {
                 lines.append("  • \(service.name)")
                 if !service.txtRecord.isEmpty {
                     for (key, value) in service.txtRecord.sorted(by: { $0.key < $1.key }) {
-                        lines.append("      \(key) = \(value)")
+                        let display = TXTValueFormatter.format(key: key, data: value.data, serviceType: service.type)
+                        lines.append("      \(key) = \(display.primaryString)")
                     }
                 }
             }
@@ -176,7 +174,8 @@ enum ServiceExporter {
             lines.append("  • \(instance.name)")
             if !instance.txtRecord.isEmpty {
                 for (key, value) in instance.txtRecord.sorted(by: { $0.key < $1.key }) {
-                    lines.append("      \(key) = \(value)")
+                    let display = TXTValueFormatter.format(key: key, data: value.data, serviceType: instance.type)
+                    lines.append("      \(key) = \(display.primaryString)")
                 }
             }
         }
@@ -191,29 +190,19 @@ enum ServiceExporter {
         lines.append("Thread Border Routers — \(ISO8601DateFormatter().string(from: Date()))")
         lines.append(String(repeating: "─", count: 50))
 
-        if !borderRouters.isEmpty {
+        let networks = ThreadNetwork.grouped(from: borderRouters)
+        if !networks.isEmpty {
             lines.append("")
-            lines.append("Border Routers (\(borderRouters.count))")
-            for router in borderRouters {
-                lines.append("  • \(router.name)")
-                lines.append("      Network: \(router.networkName)")
-                if let vendor = router.vendor {
-                    lines.append("      Vendor: \(vendor)")
+            lines.append("Border Routers (\(borderRouters.count) across \(networks.count) \(networks.count == 1 ? "network" : "networks"))")
+            for network in networks {
+                lines.append("")
+                lines.append("  [\(network.networkName)] — Extended PAN ID: \(network.extendedPANID ?? "not advertised")")
+                for warning in network.warnings {
+                    lines.append("  ⚠ \(warning)")
                 }
-                if let model = router.modelName {
-                    lines.append("      Model: \(model)")
-                }
-                if let version = router.threadVersion {
-                    lines.append("      Thread Version: \(version)")
-                }
-                if !router.stateBitmapFlags.isEmpty {
-                    lines.append("      State: \(router.stateBitmapFlags.joined(separator: ", "))")
-                }
-                if let dn = router.domainName {
-                    lines.append("      Domain: \(dn)")
-                }
-                if router.backboneRouterFlag != nil {
-                    lines.append("      Backbone Router: Yes")
+                for router in network.routers {
+                    lines.append("    • \(router.name)")
+                    appendRouterDetails(for: router, to: &lines, showActiveTimestamp: network.hasConfigDrift)
                 }
             }
         } else {
@@ -222,6 +211,34 @@ enum ServiceExporter {
         }
 
         return lines.joined(separator: "\n")
+    }
+
+    private static func appendRouterDetails(for router: ThreadBorderRouter, to lines: inout [String], showActiveTimestamp: Bool) {
+        if let vendor = router.vendor {
+            lines.append("        Vendor: \(vendor)")
+        }
+        if let model = router.modelName {
+            lines.append("        Model: \(model)")
+        }
+        if let version = router.threadVersion {
+            lines.append("        Thread Version: \(version)")
+        }
+        if !router.stateBitmapFlags.isEmpty {
+            lines.append("        State: \(router.stateBitmapFlags.joined(separator: ", "))")
+        }
+        if let dn = router.domainName {
+            lines.append("        Domain: \(dn)")
+        }
+        if router.backboneRouterFlag != nil {
+            lines.append("        Backbone Router: Yes")
+        }
+        if let at = router.activeTimestamp {
+            if showActiveTimestamp {
+                lines.append("        Active Timestamp: \(at) ⚠")
+            } else {
+                lines.append("        Active Timestamp: \(at)")
+            }
+        }
     }
 
     // MARK: - Matter Export
@@ -276,29 +293,19 @@ enum ServiceExporter {
         lines.append("Thread Network — \(ISO8601DateFormatter().string(from: Date()))")
         lines.append(String(repeating: "─", count: 50))
 
-        if !borderRouters.isEmpty {
+        let networks = ThreadNetwork.grouped(from: borderRouters)
+        if !networks.isEmpty {
             lines.append("")
-            lines.append("Border Routers (\(borderRouters.count))")
-            for router in borderRouters {
-                lines.append("  • \(router.name)")
-                lines.append("      Network: \(router.networkName)")
-                if let vendor = router.vendor {
-                    lines.append("      Vendor: \(vendor)")
+            lines.append("Border Routers (\(borderRouters.count) across \(networks.count) \(networks.count == 1 ? "network" : "networks"))")
+            for network in networks {
+                lines.append("")
+                lines.append("  [\(network.networkName)] — Extended PAN ID: \(network.extendedPANID ?? "not advertised")")
+                for warning in network.warnings {
+                    lines.append("  ⚠ \(warning)")
                 }
-                if let model = router.modelName {
-                    lines.append("      Model: \(model)")
-                }
-                if let version = router.threadVersion {
-                    lines.append("      Thread Version: \(version)")
-                }
-                if !router.stateBitmapFlags.isEmpty {
-                    lines.append("      State: \(router.stateBitmapFlags.joined(separator: ", "))")
-                }
-                if let dn = router.domainName {
-                    lines.append("      Domain: \(dn)")
-                }
-                if router.backboneRouterFlag != nil {
-                    lines.append("      Backbone Router: Yes")
+                for router in network.routers {
+                    lines.append("    • \(router.name)")
+                    appendRouterDetails(for: router, to: &lines, showActiveTimestamp: network.hasConfigDrift)
                 }
             }
         }
@@ -361,8 +368,19 @@ enum ServiceExporter {
     // MARK: - Thread JSON Export
 
     static func json(for borderRouters: [ThreadBorderRouter]) -> String {
-        let items = borderRouters.map { router in borderRouterDict(router) }
-        return jsonString(from: items)
+        let networks = ThreadNetwork.grouped(from: borderRouters)
+        let networkItems = networks.map { network -> [String: Any] in
+            var dict: [String: Any] = [
+                "networkName": network.networkName,
+                "routers": network.routers.map { borderRouterDict($0) }
+            ]
+            if let xp = network.extendedPANID { dict["extendedPANID"] = xp }
+            if !network.warnings.isEmpty {
+                dict["warnings"] = network.warnings
+            }
+            return dict
+        }
+        return jsonString(from: networkItems)
     }
 
     static func json(for trelPeers: [TRELPeer]) -> String {
@@ -401,7 +419,18 @@ enum ServiceExporter {
         srpServers: [SRPServer],
         commissionables: [MatterCommissionable]
     ) -> String {
-        let routerItems = borderRouters.map { router in borderRouterDict(router) }
+        let networks = ThreadNetwork.grouped(from: borderRouters)
+        let networkItems = networks.map { network -> [String: Any] in
+            var dict: [String: Any] = [
+                "networkName": network.networkName,
+                "routers": network.routers.map { borderRouterDict($0) }
+            ]
+            if let xp = network.extendedPANID { dict["extendedPANID"] = xp }
+            if !network.warnings.isEmpty {
+                dict["warnings"] = network.warnings
+            }
+            return dict
+        }
         let trelItems = trelPeers.map { peer -> [String: Any] in
             var dict: [String: Any] = [
                 "name": peer.name,
@@ -422,7 +451,7 @@ enum ServiceExporter {
         let commItems = commissionables.map { comm in commissionableDict(comm) }
         let dict: [String: Any] = [
             "timestamp": ISO8601DateFormatter().string(from: Date()),
-            "borderRouters": routerItems,
+            "networks": networkItems,
             "trelPeers": trelItems,
             "srpServers": srpItems,
             "commissionables": commItems
@@ -476,11 +505,15 @@ enum ServiceExporter {
 
     static func json(for instances: [ServiceInstance]) -> String {
         let items = instances.map { instance -> [String: Any] in
-            [
+            var txt: [String: Any] = [:]
+            for (key, value) in instance.txtRecord {
+                txt[key] = txtRecordEntryJSON(key: key, value: value, serviceType: instance.type)
+            }
+            return [
                 "name": instance.name,
                 "type": instance.type,
                 "domain": instance.domain,
-                "txtRecord": instance.txtRecord
+                "txtRecord": txt
             ]
         }
         let dict: [String: Any] = [
@@ -522,7 +555,8 @@ enum ServiceExporter {
         if !service.txtRecord.isEmpty {
             lines.append("TXT Record:")
             for (key, value) in service.txtRecord.sorted(by: { $0.key < $1.key }) {
-                lines.append("  \(key) = \(value)")
+                let display = TXTValueFormatter.format(key: key, data: value.data, serviceType: service.type)
+                lines.append("  \(key) = \(display.primaryString)")
             }
         }
 
@@ -531,7 +565,32 @@ enum ServiceExporter {
         return lines.joined(separator: "\n")
     }
 
+    /// Build the structured TXT-entry JSON object used by both single-service
+    /// and all-services exports: `{hex, text?, decoded?, label?}`.
+    static func txtRecordEntryJSON(key: String, value: TXTValue, serviceType: String) -> [String: Any] {
+        let display = TXTValueFormatter.format(key: key, data: value.data, serviceType: serviceType)
+        var entry: [String: Any] = ["hex": TXTValueFormatter.hexString(value.data)]
+        switch display {
+        case .text(let s):
+            entry["text"] = s
+        case .decoded(let primary, _):
+            entry["decoded"] = primary
+        case .flags(_, let description):
+            entry["decoded"] = description
+        case .hex, .empty:
+            break
+        }
+        if let label = TXTRecordLabels.label(for: key, serviceType: serviceType) {
+            entry["label"] = label
+        }
+        return entry
+    }
+
     private static func rawJSONDict(for service: ResolvedService) -> [String: Any] {
+        var rawTXT: [String: String] = [:]
+        for (key, value) in service.txtRecord {
+            rawTXT[key] = TXTValueFormatter.hexString(value.data)
+        }
         var dict: [String: Any] = [
             "name": service.name,
             "type": service.type,
@@ -540,7 +599,7 @@ enum ServiceExporter {
             "port": service.port,
             "ipv4Addresses": service.ipv4Addresses,
             "ipv6Addresses": service.ipv6Addresses,
-            "txtRecord": service.txtRecord,
+            "txtRecord": rawTXT,
             "resolvedAt": ISO8601DateFormatter().string(from: service.resolvedAt)
         ]
         if !service.reverseDNS.isEmpty {
@@ -555,9 +614,9 @@ enum ServiceExporter {
         var dict: [String: Any] = [
             "name": router.name,
             "networkName": router.networkName,
-            "extendedPANID": router.extendedPANID,
             "addresses": router.addresses
         ]
+        if let v = router.extendedPANID { dict["extendedPANID"] = v }
         if let v = router.panID { dict["panID"] = v }
         if let v = router.vendor { dict["vendor"] = v }
         if let v = router.modelName { dict["modelName"] = v }
@@ -569,7 +628,7 @@ enum ServiceExporter {
             }
         }
         if let v = router.activeTimestamp { dict["activeTimestamp"] = v }
-        if let v = router.pendingTimestamp { dict["pendingTimestamp"] = v }
+        if let v = router.partitionID { dict["partitionID"] = v }
         if let v = router.sequenceNumber { dict["sequenceNumber"] = v }
         if let v = router.backboneRouterFlag { dict["backboneRouterFlag"] = v }
         if let v = router.domainName { dict["domainName"] = v }

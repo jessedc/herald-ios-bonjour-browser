@@ -16,6 +16,11 @@ final class ThreadNetworkViewModel: ObservableObject, TextExportable {
         }
     }
 
+    /// Border routers grouped by Extended PAN ID (Thread mesh network).
+    var networks: [ThreadNetwork] {
+        ThreadNetwork.grouped(from: service.borderRouters)
+    }
+
     var errors: [DiscoveryError] { service.errors }
 
     func clearErrors() {

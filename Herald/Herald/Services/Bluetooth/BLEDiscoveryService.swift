@@ -167,7 +167,7 @@ final class BLEDiscoveryService: ObservableObject, UITestingConfigurable {
         logger.info("startDiscovery: UI testing mode - injecting mock Matter commissioning devices")
         peripherals = [
             BLEPeripheral(
-                identifier: UUID(uuidString: "A1B2C3D4-E5F6-7890-ABCD-EF1234567890")!,
+                identifier: UUID(uuidString: "A1B2C3D4-E5F6-7890-ABCD-EF1234567890") ?? UUID(),
                 localName: "Test Matter Light",
                 advertisedServiceUUIDs: ["FFF6"],
                 manufacturerData: nil,
@@ -178,7 +178,7 @@ final class BLEDiscoveryService: ObservableObject, UITestingConfigurable {
                 lastSeen: Date()
             ),
             BLEPeripheral(
-                identifier: UUID(uuidString: "B2C3D4E5-F6A7-8901-BCDE-F12345678901")!,
+                identifier: UUID(uuidString: "B2C3D4E5-F6A7-8901-BCDE-F12345678901") ?? UUID(),
                 localName: "Test Matter Sensor",
                 advertisedServiceUUIDs: ["FFF6"],
                 manufacturerData: nil,

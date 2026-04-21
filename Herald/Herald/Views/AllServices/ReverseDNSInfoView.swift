@@ -20,7 +20,7 @@ struct ReverseDNSInfoView: View {
                     + "results \u{2014} this is normal. The feature is most useful in managed network "
                     + "environments or networks with custom DNS configuration."
                 )
-                
+
                 Text("When PTR records provide new information:")
                     .fontWeight(.semibold)
 

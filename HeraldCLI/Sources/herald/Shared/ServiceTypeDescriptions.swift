@@ -1,0 +1,1 @@
+../../../../Herald/Herald/Utilities/ServiceTypeDescriptions.swift

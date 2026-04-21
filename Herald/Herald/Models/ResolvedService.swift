@@ -8,7 +8,7 @@ struct ResolvedService: Identifiable {
     let port: UInt16
     let ipv4Addresses: [String]
     let ipv6Addresses: [String]
-    let txtRecord: [String: String]
+    let txtRecord: [String: TXTValue]
     let reverseDNS: [String: String]
     let resolvedAt: Date
 
@@ -20,7 +20,7 @@ struct ResolvedService: Identifiable {
         port: UInt16,
         ipv4Addresses: [String],
         ipv6Addresses: [String],
-        txtRecord: [String: String],
+        txtRecord: [String: TXTValue],
         reverseDNS: [String: String] = [:],
         resolvedAt: Date
     ) {
