@@ -97,6 +97,16 @@ swift run herald --help
 
 Pass `--compact` to any subcommand for single-line JSON (ideal for piping into `jq`). Errors are emitted as a JSON object on stderr with a non-zero exit code.
 
+### Installing as `herald` on your $PATH
+
+To run the CLI as a bare `herald` from any directory, build a release binary and place it on your `$PATH`. A helper script does the build:
+
+```bash
+./scripts/build_cli.sh
+```
+
+It compiles `HeraldCLI` in release mode and prints the resulting binary path. To use it as a bare `herald` command, copy or move that binary into a directory on your `$PATH`.
+
 ## Architecture
 
 ### Discovery Flow
